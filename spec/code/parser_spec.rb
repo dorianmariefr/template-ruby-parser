@@ -5,58 +5,41 @@ RSpec.describe ::Code::Parser do
 
   [
     ["", []],
-    ["nothing", [{ nothing: { value: "nothing" } }]],
-    ["nil", [{ nothing: { value: "nil" } }]],
-    ["null", [{ nothing: { value: "null" } }]],
-    ["true", [{ boolean: { value: "true" } }]],
-    ["false", [{ boolean: { value: "false" } }]],
-    ["''", [{ string: { value: [] } }]],
-    ['""', [{ string: { value: [] } }]],
-    ["'hello'", [{ string: { value: [{ text: "hello" }] } }]],
-    ['"hello"', [{ string: { value: [{ text: "hello" }] } }]],
+    ["nothing", [{ nothing: "nothing" }]],
+    ["nil", [{ nothing: "nil" }]],
+    ["null", [{ nothing: "null" }]],
+    ["true", [{ boolean: "true" }]],
+    ["false", [{ boolean: "false" }]],
+    ["''", [{ string: [] }]],
+    ['""', [{ string: [] }]],
+    ["'hello'", [{ string: [{ text: "hello" }] }]],
+    ['"hello"', [{ string: [{ text: "hello" }] }]],
     [
       "'hello\\a\\b\\r\\n\\s\\t'",
-      [{ string: { value: [{ text: "hello\a\b\r\n\s\t" }] } }]
+      [{ string: [{ text: "hello\a\b\r\n\s\t" }] }]
     ],
     [
       '"hello\\a\\b\\r\\n\\s\\t"',
-      [{ string: { value: [{ text: "hello\a\b\r\n\s\t" }] } }]
+      [{ string: [{ text: "hello\a\b\r\n\s\t" }] }]
     ],
-    ['"hello"', [{ string: { value: [{ text: "hello" }] } }]],
-    ["'hello\"Dorian'", [{ string: { value: [{ text: 'hello"Dorian' }] } }]],
-    ['"hello\'Dorian"', [{ string: { value: [{ text: "hello'Dorian" }] } }]],
-    ["'hello\\'Dorian'", [{ string: { value: [{ text: "hello'Dorian" }] } }]],
-    ['"hello\\"Dorian"', [{ string: { value: [{ text: 'hello"Dorian' }] } }]],
-    ["'hello \\{name}'", [{ string: { value: [{ text: "hello {name}" }] } }]],
-    ['"hello \\{name}"', [{ string: { value: [{ text: "hello {name}" }] } }]],
+    ['"hello"', [{ string: [{ text: "hello" }] }]],
+    ["'hello\"Dorian'", [{ string: [{ text: 'hello"Dorian' }] }]],
+    ['"hello\'Dorian"', [{ string: [{ text: "hello'Dorian" }] }]],
+    ["'hello\\'Dorian'", [{ string: [{ text: "hello'Dorian" }] }]],
+    ['"hello\\"Dorian"', [{ string: [{ text: 'hello"Dorian' }] }]],
+    ["'hello \\{name}'", [{ string: [{ text: "hello {name}" }] }]],
+    ['"hello \\{name}"', [{ string: [{ text: "hello {name}" }] }]],
     [
       "'hello {name}'",
-      [
-        {
-          string: {
-            value: [
-              { text: "hello " },
-              { code: [{ variable: { value: "name" } }] }
-            ]
-          }
-        }
-      ]
+      [{ string: [{ text: "hello " }, { code: [{ variable: "name" }] }] }]
     ],
     [
       '"hello {name}"',
-      [
-        {
-          string: {
-            value: [
-              { text: "hello " },
-              { code: [{ variable: { value: "name" } }] }
-            ]
-          }
-        }
-      ]
-    ]
+      [{ string: [{ text: "hello " }, { code: [{ variable: "name" }] }] }]
+    ],
+    ["1", [{ integer: "1" }]]
   ].each do |input, output|
-    context input.inspect do
+    context input do
       let!(:input) { input }
 
       it { expect(subject).to eq(output) }

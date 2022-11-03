@@ -7,28 +7,25 @@ RSpec.describe ::Template::Parser do
     ["", []],
     ["Hello Dorian", [{ text: "Hello Dorian" }]],
     ["Hello \\{name}", [{ text: "Hello {name}" }]],
-    [
-      "Hello {name}",
-      [{ text: "Hello " }, { code: [{ variable: { value: "name" } }] }]
-    ],
+    ["Hello {name}", [{ text: "Hello " }, { code: [{ variable: "name" }] }]],
     [
       "Hello {name} you are {age} years old",
       [
         { text: "Hello " },
-        { code: [{ variable: { value: "name" } }] },
+        { code: [{ variable: "name" }] },
         { text: " you are " },
-        { code: [{ variable: { value: "age" } }] },
+        { code: [{ variable: "age" }] },
         { text: " years old" }
       ]
     ],
-    ["{name", [{ code: [{ variable: { value: "name" } }] }]],
-    ["{nothing", [{ code: [{ nothing: { value: "nothing" } }] }]],
-    ["{nil", [{ code: [{ nothing: { value: "nil" } }] }]],
-    ["{null", [{ code: [{ nothing: { value: "null" } }] }]],
-    ["{true", [{ code: [{ boolean: { value: "true" } }] }]],
-    ["{false", [{ code: [{ boolean: { value: "false" } }] }]]
+    ["{name", [{ code: [{ variable: "name" }] }]],
+    ["{nothing", [{ code: [{ nothing: "nothing" }] }]],
+    ["{nil", [{ code: [{ nothing: "nil" }] }]],
+    ["{null", [{ code: [{ nothing: "null" }] }]],
+    ["{true", [{ code: [{ boolean: "true" }] }]],
+    ["{false", [{ code: [{ boolean: "false" }] }]]
   ].each do |input, output|
-    context input.inspect do
+    context input do
       let!(:input) { input }
 
       it { expect(subject).to eq(output) }
