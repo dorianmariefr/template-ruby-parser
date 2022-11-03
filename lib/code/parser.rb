@@ -86,13 +86,13 @@ class Code
             buffer += quote
           elsif peek == "{"
             advance
-            buffer += "{"
+            buffer += "\\{"
           else
             buffer += c
           end
         elsif c == "{"
           if buffer != ""
-            output << { text: buffer }
+            output << { text: escape_string(buffer) }
             buffer = ""
           end
 
@@ -104,9 +104,7 @@ class Code
         end
       end
 
-      if buffer != ""
-        output << { text: buffer }
-      end
+      output << { text: escape_string(buffer) } if buffer != ""
 
       advance
 
@@ -120,7 +118,7 @@ class Code
         .gsub("\\a", "\a")
         .gsub("\\r", "\r")
         .gsub("\\s", "\s")
-        .gsub("\\a", "\a")
+        .gsub("\\b", "\b")
         .gsub(/\\(.)/, '\1')
     end
   end

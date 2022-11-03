@@ -14,10 +14,21 @@ RSpec.describe ::Code::Parser do
     ['""', [{ string: { value: [] } }]],
     ["'hello'", [{ string: { value: [{ text: "hello" }] } }]],
     ['"hello"', [{ string: { value: [{ text: "hello" }] } }]],
+    [
+      "'hello\\a\\b\\r\\n\\s\\t'",
+      [{ string: { value: [{ text: "hello\a\b\r\n\s\t" }] } }]
+    ],
+    [
+      '"hello\\a\\b\\r\\n\\s\\t"',
+      [{ string: { value: [{ text: "hello\a\b\r\n\s\t" }] } }]
+    ],
+    ['"hello"', [{ string: { value: [{ text: "hello" }] } }]],
     ["'hello\"Dorian'", [{ string: { value: [{ text: 'hello"Dorian' }] } }]],
     ['"hello\'Dorian"', [{ string: { value: [{ text: "hello'Dorian" }] } }]],
     ["'hello\\'Dorian'", [{ string: { value: [{ text: "hello'Dorian" }] } }]],
     ['"hello\\"Dorian"', [{ string: { value: [{ text: 'hello"Dorian' }] } }]],
+    ["'hello \\{name}'", [{ string: { value: [{ text: "hello {name}" }] } }]],
+    ['"hello \\{name}"', [{ string: { value: [{ text: "hello {name}" }] } }]],
     [
       "'hello {name}'",
       [
