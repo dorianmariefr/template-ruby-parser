@@ -10,14 +10,40 @@ RSpec.describe ::Code::Parser do
     ["null", [{ nothing: { value: "null" } }]],
     ["true", [{ boolean: { value: "true" } }]],
     ["false", [{ boolean: { value: "false" } }]],
-    ["''", [{ string: { value: "" } }]],
-    ['""', [{ string: { value: "" } }]],
-    ["'hello'", [{ string: { value: "hello" } }]],
-    ['"hello"', [{ string: { value: "hello" } }]],
-    ["'hello\"Dorian'", [{ string: { value: 'hello"Dorian' } }]],
-    ['"hello\'Dorian"', [{ string: { value: "hello'Dorian" } }]],
-    ["'hello\\'Dorian'", [{ string: { value: "hello'Dorian" } }]],
-    ['"hello\\"Dorian"', [{ string: { value: 'hello"Dorian' } }]],
+    ["''", [{ string: { value: [] } }]],
+    ['""', [{ string: { value: [] } }]],
+    ["'hello'", [{ string: { value: [{ text: "hello" }] } }]],
+    ['"hello"', [{ string: { value: [{ text: "hello" }] } }]],
+    ["'hello\"Dorian'", [{ string: { value: [{ text: 'hello"Dorian' }] } }]],
+    ['"hello\'Dorian"', [{ string: { value: [{ text: "hello'Dorian" }] } }]],
+    ["'hello\\'Dorian'", [{ string: { value: [{ text: "hello'Dorian" }] } }]],
+    ['"hello\\"Dorian"', [{ string: { value: [{ text: 'hello"Dorian' }] } }]],
+    [
+      "'hello {name}'",
+      [
+        {
+          string: {
+            value: [
+              { text: "hello " },
+              { code: [{ variable: { value: "name" } }] }
+            ]
+          }
+        }
+      ]
+    ],
+    [
+      '"hello {name}"',
+      [
+        {
+          string: {
+            value: [
+              { text: "hello " },
+              { code: [{ variable: { value: "name" } }] }
+            ]
+          }
+        }
+      ]
+    ]
   ].each do |input, output|
     context input.inspect do
       let!(:input) { input }

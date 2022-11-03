@@ -20,9 +20,9 @@ class Code
         c = advance
 
         if c == "'"
-          single_quoted_string
+          string("'")
         elsif c == '"'
-          double_quoted_string
+          string('"')
         elsif c == "}"
           @at_end = true
         else
@@ -73,40 +73,44 @@ class Code
       end
     end
 
-    def single_quoted_string
-      while peek != "'" && !at_end?
-        if peek == "\\"
-          advance
-        end
+    def string(quote)
+      buffer = ""
+      output = []
 
-        advance
+      while peek != quote && !at_end?
+        c = advance
+
+        if c == "\\"
+          if peek == quote
+            advance
+            buffer += quote
+          elsif peek == "{"
+            advance
+            buffer += "{"
+          else
+            buffer += c
+          end
+        elsif c == "{"
+          if buffer != ""
+            output << { text: buffer }
+            buffer = ""
+          end
+
+          code_parser = ::Code::Parser.new(input, current: current)
+          output << { code: code_parser.parse }
+          @current = code_parser.current
+        else
+          buffer += c
+        end
       end
 
-      if at_end?
-        syntax_error(:unterminated_single_quoted_string)
+      if buffer != ""
+        output << { text: buffer }
       end
 
       advance
 
-      @output << { string: { value: escape_string(input[(start + 1)...(current - 1)]) } }
-    end
-
-    def double_quoted_string
-      while peek != '"' && !at_end?
-        if peek == "\\"
-          advance
-        end
-
-        advance
-      end
-
-      if at_end?
-        syntax_error(:unterminated_single_quoted_string)
-      end
-
-      advance
-
-      @output << { string: { value: escape_string(input[(start + 1)...(current - 1)]) } }
+      @output << { string: { value: output } }
     end
 
     def escape_string(string)
