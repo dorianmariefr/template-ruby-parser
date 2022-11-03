@@ -148,7 +148,7 @@ class Code
           else
             buffer += c
           end
-        elsif c == CLOSING_CURLY_BRACKET
+        elsif c == OPENING_CURLY_BRACKET
           if buffer != EMPTY_STRING
             output << { text: escape_string(buffer) }
             buffer = EMPTY_STRING
