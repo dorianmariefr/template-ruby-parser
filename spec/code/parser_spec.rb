@@ -37,7 +37,10 @@ RSpec.describe ::Code::Parser do
       '"hello {name}"',
       [{ string: [{ text: "hello " }, { code: [{ variable: "name" }] }] }]
     ],
-    ["1", [{ integer: "1" }]]
+    ["1", [{ integer: "1" }]],
+    ["100", [{ integer: "100" }]],
+    ["1.0", [{ decimal: "1.0" }]],
+    ["123.24", [{ decimal: "123.24" }]]
   ].each do |input, output|
     context input do
       let!(:input) { input }
