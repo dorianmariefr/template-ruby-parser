@@ -13,6 +13,8 @@ class Code
     CLOSING_CURLY_BRACKET = "}"
     OPENING_SQUARE_BRACKET = "["
     CLOSING_SQUARE_BRACKET = "]"
+    OPENING_PARENTHESIS = "("
+    CLOSING_PARENTHESIS = ")"
     DOT = "."
     BACKSLASH = "\\"
     COMMA = ","
@@ -48,7 +50,8 @@ class Code
     SPECIAL = [
       SINGLE_QUOTE, DOUBLE_QUOTE, OPENING_CURLY_BRACKET, CLOSING_CURLY_BRACKET,
       OPENING_SQUARE_BRACKET, CLOSING_SQUARE_BRACKET, BACKSLASH, DOT, COMMA,
-      SPACE, SLASH, ASTERISK, NEWLINE, HASH, COLON, EQUAL, GREATER, LESSER
+      SPACE, SLASH, ASTERISK, NEWLINE, HASH, COLON, EQUAL, GREATER, LESSER,
+      OPENING_PARENTHESIS, CLOSING_PARENTHESIS
     ]
 
     def initialize(input, current: 0)
@@ -85,6 +88,8 @@ class Code
           @output << { newline: c }
         elsif c == HASH
           parse_comment
+        elsif c == OPENING_PARENTHESIS
+          parse_group
         elsif c == SLASH
           if match(ASTERISK)
             parse_multi_line_comment
@@ -220,11 +225,9 @@ class Code
         end
       end
 
-      syntax_error("Unterminated string, missing #{quote}") if end_of_input?
+      advance if !end_of_input?
 
       output << { text: escape_string(buffer) } if buffer != EMPTY_STRING
-
-      advance
 
       @output << { string: output }
     end
@@ -269,9 +272,7 @@ class Code
         list << code if code.any?
       end
 
-      syntax_error("Unterminated list, missing ]") if end_of_input?
-
-      advance
+      advance if !end_of_input?
 
       @output << { list: list }
     end
@@ -330,6 +331,12 @@ class Code
       advance
 
       @output << { dictionnary: dictionnary.compact }
+    end
+
+    def parse_group
+      @output << { group: parse_code }
+
+      match(CLOSING_PARENTHESIS)
     end
   end
 end
