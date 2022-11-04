@@ -27,6 +27,7 @@ class Code
     EQUAL = "="
     GREATER = ">"
     LESSER = "<"
+    AMPERSAND = "&"
 
     SPECIAL_BELL = "\\a"
     SPECIAL_BELL_ESCAPED = "\a"
@@ -51,7 +52,7 @@ class Code
       SINGLE_QUOTE, DOUBLE_QUOTE, OPENING_CURLY_BRACKET, CLOSING_CURLY_BRACKET,
       OPENING_SQUARE_BRACKET, CLOSING_SQUARE_BRACKET, BACKSLASH, DOT, COMMA,
       SPACE, SLASH, ASTERISK, NEWLINE, HASH, COLON, EQUAL, GREATER, LESSER,
-      OPENING_PARENTHESIS, CLOSING_PARENTHESIS
+      OPENING_PARENTHESIS, CLOSING_PARENTHESIS, AMPERSAND
     ]
 
     def initialize(input, current: 0)
@@ -90,6 +91,14 @@ class Code
           parse_comment
         elsif c == OPENING_PARENTHESIS
           parse_group
+        elsif c == AMPERSAND
+          parse_variable(offset: 1, block: true)
+        elsif c == ASTERISK
+          if match(ASTERISK)
+            parse_variable(offset: 2, splat: :keyword)
+          else
+            parse_variable(offset: 1, splat: :regular)
+          end
         elsif c == SLASH
           if match(ASTERISK)
             parse_multi_line_comment
@@ -196,6 +205,12 @@ class Code
       else
         @output << { variable: identifier }
       end
+    end
+
+    def parse_variable(offset:, **args)
+      advance while !next?(SPECIAL) && !end_of_input?
+
+      @output << { variable: { name: input[(start + offset)...current], **args } }
     end
 
     def parse_string(quote)

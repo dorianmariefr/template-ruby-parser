@@ -10,7 +10,10 @@ RSpec.describe ::Code::Parser do
     ["UserController", [{ variable: "UserController" }]],
     ["admin?", [{ variable: "admin?" }]],
     ["defined?", [{ variable: "defined?" }]],
-    ["update!", [{ variable: "update!" }]]
+    ["update!", [{ variable: "update!" }]],
+    ["*args", [{ variable: { name: "args", splat: :regular } }]],
+    ["**kargs", [{ variable: { name: "kargs", splat: :keyword} }]],
+    ["&block", [{ variable: { name: "block", block: true } }]]
   ].each do |input, output|
     context input do
       let!(:input) { input }
