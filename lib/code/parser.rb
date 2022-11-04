@@ -61,6 +61,7 @@ class Code
       @current = current
       @output = []
       @end_of_input = false
+      @has_space = true
     end
 
     def self.parse(input)
@@ -72,43 +73,54 @@ class Code
         @start = current
         c = advance
 
-        if DIGITS.include?(c)
-          parse_number
-        elsif c == OPENING_SQUARE_BRACKET
-          parse_list
-        elsif c == OPENING_CURLY_BRACKET
-          parse_dictionnary
-        elsif c == SINGLE_QUOTE
-          parse_string(SINGLE_QUOTE)
-        elsif c == DOUBLE_QUOTE
-          parse_string(DOUBLE_QUOTE)
+        if c == SPACE
+          @has_space = true
+        elsif c == NEWLINE
+          @has_space = true
+          @output << { newline: c }
         elsif c == CLOSING_CURLY_BRACKET
           @end_of_input = true
-        elsif c == SPACE
-        elsif c == NEWLINE
-          @output << { newline: c }
-        elsif c == HASH
-          parse_comment
-        elsif c == OPENING_PARENTHESIS
-          parse_group
-        elsif c == AMPERSAND
-          parse_variable(offset: 1, block: true)
-        elsif c == ASTERISK
-          if match(ASTERISK)
-            parse_variable(offset: 2, splat: :keyword)
-          else
-            parse_variable(offset: 1, splat: :regular)
-          end
-        elsif c == SLASH
-          if match(ASTERISK)
-            parse_multi_line_comment
-          elsif match(SLASH)
+        elsif has_space?
+          @has_space = false
+
+          if DIGITS.include?(c)
+            parse_number
+          elsif c == OPENING_SQUARE_BRACKET
+            parse_list
+          elsif c == OPENING_CURLY_BRACKET
+            parse_dictionnary
+          elsif c == SINGLE_QUOTE
+            parse_string(SINGLE_QUOTE)
+          elsif c == DOUBLE_QUOTE
+            parse_string(DOUBLE_QUOTE)
+          elsif c == HASH
             parse_comment
+          elsif c == COLON && !next?(SPECIAL)
+            parse_symbol
+          elsif c == OPENING_PARENTHESIS
+            parse_group
+          elsif c == AMPERSAND
+            parse_variable(offset: 1, block: true)
+          elsif c == ASTERISK
+            if match(ASTERISK)
+              parse_variable(offset: 2, splat: :keyword)
+            else
+              parse_variable(offset: 1, splat: :regular)
+            end
+          elsif c == SLASH
+            if match(ASTERISK)
+              parse_multi_line_comment
+            elsif match(SLASH)
+              parse_comment
+            else
+              raise NotImplementedError
+            end
+          elsif !SPECIAL.include?(c)
+            parse_identifier
           else
-            raise NotImplementedError
+            @current -= 1
+            @end_of_input = true
           end
-        elsif !SPECIAL.include?(c)
-          parse_identifier
         else
           @current -= 1
           @end_of_input = true
@@ -136,6 +148,10 @@ class Code
       else
         input[current + 1, expected.size] == expected
       end
+    end
+
+    def has_space?
+      !!@has_space
     end
 
     def end_of_input?
@@ -203,6 +219,7 @@ class Code
       elsif identifier == TRUE_KEYWORD || identifier == FALSE_KEYWORD
         @output << { boolean: identifier }
       else
+        return if parse_call({ name: identifier })
         @output << { variable: identifier }
       end
     end
@@ -210,7 +227,11 @@ class Code
     def parse_variable(offset:, **args)
       advance while !next?(SPECIAL) && !end_of_input?
 
-      @output << { variable: { name: input[(start + offset)...current], **args } }
+      variable = { name: input[(start + offset)...current], **args }
+
+      return if parse_call(variable)
+
+      @output << { variable: variable }
     end
 
     def parse_string(quote)
@@ -343,7 +364,7 @@ class Code
         dictionnary << parse_dictionnary_key_value
       end
 
-      advance
+      match(CLOSING_CURLY_BRACKET)
 
       @output << { dictionnary: dictionnary.compact }
     end
@@ -352,6 +373,38 @@ class Code
       @output << { group: parse_code }
 
       match(CLOSING_PARENTHESIS)
+    end
+
+    def parse_call(variable)
+      if match(OPENING_PARENTHESIS)
+        arguments = []
+        code = parse_code
+
+        arguments << code if code.any?
+
+        while next?(COMMA) && !end_of_input?
+          advance
+
+          code = parse_code
+          arguments << code if code.any?
+        end
+
+        arguments = nil if arguments.empty?
+
+        match(CLOSING_PARENTHESIS)
+
+        @output << { call: { **variable.merge(arguments: arguments).compact } }
+
+        true
+      else
+        false
+      end
+    end
+
+    def parse_symbol
+      advance while !next?(SPECIAL) && !end_of_input?
+
+      @output << { string: input[(start + 1)...current] }
     end
   end
 end

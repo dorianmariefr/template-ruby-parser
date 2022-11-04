@@ -12,7 +12,7 @@ RSpec.describe ::Code::Parser do
     ["defined?", [{ variable: "defined?" }]],
     ["update!", [{ variable: "update!" }]],
     ["*args", [{ variable: { name: "args", splat: :regular } }]],
-    ["**kargs", [{ variable: { name: "kargs", splat: :keyword} }]],
+    ["**kargs", [{ variable: { name: "kargs", splat: :keyword } }]],
     ["&block", [{ variable: { name: "block", block: true } }]]
   ].each do |input, output|
     context input do
