@@ -21,6 +21,10 @@ class Code
     ASTERISK = "*"
     NEWLINE = "\n"
     HASH = "#"
+    COLON = ":"
+    EQUAL = "="
+    GREATER = ">"
+    LESSER = "<"
 
     SPECIAL_BELL = "\\a"
     SPECIAL_BELL_ESCAPED = "\a"
@@ -44,7 +48,7 @@ class Code
     SPECIAL = [
       SINGLE_QUOTE, DOUBLE_QUOTE, OPENING_CURLY_BRACKET, CLOSING_CURLY_BRACKET,
       OPENING_SQUARE_BRACKET, CLOSING_SQUARE_BRACKET, BACKSLASH, DOT, COMMA,
-      SPACE, SLASH, ASTERISK, NEWLINE, HASH
+      SPACE, SLASH, ASTERISK, NEWLINE, HASH, COLON, EQUAL, GREATER, LESSER
     ]
 
     def initialize(input, current: 0)
@@ -69,7 +73,7 @@ class Code
         elsif c == OPENING_SQUARE_BRACKET
           parse_list
         elsif c == OPENING_CURLY_BRACKET
-          parse_dicitionnary
+          parse_dictionnary
         elsif c == SINGLE_QUOTE
           parse_string(SINGLE_QUOTE)
         elsif c == DOUBLE_QUOTE
@@ -80,12 +84,12 @@ class Code
         elsif c == NEWLINE
           @output << { newline: c }
         elsif c == HASH
-          comment
+          parse_comment
         elsif c == SLASH
           if match(ASTERISK)
-            multi_line_comment
+            parse_multi_line_comment
           elsif match(SLASH)
-            comment
+            parse_comment
           else
             raise NotImplementedError
           end
@@ -104,12 +108,20 @@ class Code
 
     attr_reader :input, :start, :buffer, :output
 
-    def peek
-      input[current]
+    def next?(expected)
+      if expected.is_a?(Array)
+        expected.any? { |e| next?(e) }
+      else
+        input[current, expected.size] == expected
+      end
     end
 
-    def peek_next
-      input[current + 1]
+    def next_next?(expected)
+      if expected.is_a?(Array)
+        expected.any? { |e| next_next?(e) }
+      else
+        input[current + 1, expected.size] == expected
+      end
     end
 
     def end_of_input?
@@ -122,7 +134,7 @@ class Code
     end
 
     def match(expected)
-      if end_of_input? || input[current] != expected
+      if end_of_input? || input[current, expected.size] != expected
         false
       else
         @current += 1
@@ -167,7 +179,7 @@ class Code
     end
 
     def parse_identifier
-      advance while !SPECIAL.include?(peek) && !end_of_input?
+      advance while !next?(SPECIAL) && !end_of_input?
 
       identifier = input[start...current]
 
@@ -185,15 +197,14 @@ class Code
       buffer = EMPTY_STRING
       output = []
 
-      while peek != quote && !end_of_input?
+      while !next?(quote) && !end_of_input?
         c = advance
 
         if c == BACKSLASH
-          if peek == quote
-            advance
+          if match(quote)
             buffer += quote
-          elsif peek == OPENING_CURLY_BRACKET
-            buffer += advance
+          elsif match(OPENING_CURLY_BRACKET)
+            buffer += OPENING_CURLY_BRACKET
           else
             buffer += c
           end
@@ -230,12 +241,12 @@ class Code
     end
 
     def parse_number
-      advance while DIGITS.include?(peek)
+      advance while next?(DIGITS)
 
-      if peek == DOT && DIGITS.include?(peek_next)
+      if next?(DOT) && next_next?(DIGITS)
         advance
 
-        advance while DIGITS.include?(peek)
+        advance while next?(DIGITS)
 
         @output << { decimal: input[start...current] }
       else
@@ -250,52 +261,7 @@ class Code
 
       list << code if code.any?
 
-      while peek == COMMA && !end_of_input?
-        advance
-
-        list << parse_code
-      end
-
-      syntax_error("Unterminated list, missing ]") if end_of_input?
-
-      advance
-
-      @output << { string: output }
-    end
-
-    def escape_string(string)
-      string
-        .gsub(SPECIAL_BELL, SPECIAL_BELL_ESCAPED)
-        .gsub(SPECIAL_BACKSPACE, SPECIAL_BACKSPACE_ESCAPED)
-        .gsub(SPECIAL_CARRIAGE_RETURN, SPECIAL_CARRIAGE_RETURN_ESCAPED)
-        .gsub(SPECIAL_NEWLINE, SPECIAL_NEWLINE_ESCAPED)
-        .gsub(SPECIAL_SPACE, SPECIAL_SPACE_ESCAPED)
-        .gsub(SPECIAL_TAB, SPECIAL_TAB_ESCAPED)
-        .gsub(/\\(.)/, '\1')
-    end
-
-    def parse_number
-      advance while DIGITS.include?(peek)
-
-      if peek == DOT && DIGITS.include?(peek_next)
-        advance
-
-        advance while DIGITS.include?(peek)
-
-        @output << { decimal: input[start...current] }
-      else
-        @output << { integer: input[start...current] }
-      end
-    end
-
-    def parse_list
-      list = []
-
-      code = parse_code
-
-      list << code if code.any?
-
-      while peek == COMMA && !end_of_input?
+      while next?(COMMA) && !end_of_input?
         advance
 
         code = parse_code
@@ -303,13 +269,15 @@ class Code
         list << code if code.any?
       end
 
+      syntax_error("Unterminated list, missing ]") if end_of_input?
+
       advance
 
       @output << { list: list }
     end
 
-    def multi_line_comment
-      advance while peek != ASTERISK && peek_next != SLASH && !end_of_input?
+    def parse_multi_line_comment
+      advance while !next?(ASTERISK) && !next_next?(SLASH) && !end_of_input?
 
       if !end_of_input?
         advance
@@ -319,12 +287,49 @@ class Code
       @output << { comment: input[start...current] }
     end
 
-    def comment
-      advance while peek != NEWLINE && !end_of_input?
+    def parse_comment
+      advance while !next?(NEWLINE) && !end_of_input?
 
       advance if !end_of_input?
 
       @output << { comment: input[start...current] }
+    end
+
+    def parse_dictionnary_key_value
+      key = parse_code
+
+      return if key.empty?
+
+      if next?(COLON) || next?(EQUAL + GREATER)
+        if next?(COLON)
+          advance
+        else
+          advance
+          advance
+        end
+
+        value = parse_code
+
+        { key: key, value: value }
+      else
+        { key: key }
+      end
+    end
+
+    def parse_dictionnary
+      dictionnary = []
+
+      dictionnary << parse_dictionnary_key_value
+
+      while next?(COMMA) && !end_of_input?
+        advance
+
+        dictionnary << parse_dictionnary_key_value
+      end
+
+      advance
+
+      @output << { dictionnary: dictionnary.compact }
     end
   end
 end
