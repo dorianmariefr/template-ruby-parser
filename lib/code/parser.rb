@@ -1,6 +1,6 @@
 class Code
   class Parser
-    attr_reader :current, :start, :end_of_input
+    attr_accessor :input, :cursor, :buffer
 
     EMPTY_STRING = ""
 
@@ -61,26 +61,20 @@ class Code
       OPENING_PARENTHESIS, CLOSING_PARENTHESIS, AMPERSAND, PIPE
     ]
 
-    def initialize(input, current: 0, start: 0, expect_end_of_input: true)
+    def initialize(input, cursor: 0, buffer: EMPTY_STRING)
       @input = input
-      @start = start
-      @current = current
-      @output = []
-      @end_of_input = false
-      @has_space = true
-      @expect_end_of_input = expect_end_of_input
+      @cursor = cursor
+      @buffer = buffer
     end
 
     def self.parse(input)
       new(input).parse
     end
 
-    def parse
-      until end_of_input?
-        add(parse_subclass(::Code::Parser::Dictionnary))
-      end
+    def parse(check_end_of_input: true)
+      output = [parse_subclass(::Code::Parser::Nothing)]
 
-      if expect_end_of_input? && current < input.size
+      if cursor >= input.size && check_end_of_input
         syntax_error("Unexpected end of input")
       end
 
@@ -89,83 +83,13 @@ class Code
 
     private
 
-    attr_reader :input, :buffer, :output
-
-    def next?(expected)
-      if expected.is_a?(Array)
-        expected.any? { |e| next?(e) }
+    def consume(n = 1)
+      if cursor + n <= input.size
+        @buffer += input[cursor, n]
+        @cursor += n
       else
-        input[current, expected.size] == expected
+        syntax_error("Unexpected end of input")
       end
-    end
-
-    def next_next?(expected)
-      if expected.is_a?(Array)
-        expected.any? { |e| next_next?(e) }
-      else
-        input[current + 1, expected.size] == expected
-      end
-    end
-
-    def has_space?
-      !!@has_space
-    end
-
-    def expect_end_of_input?
-      !!@expect_end_of_input
-    end
-
-    def end_of_input?
-      current >= input.size || @end_of_input
-    end
-
-    def advance
-      @current += 1
-      input[current - 1]
-    end
-
-    def match(expected)
-      if expected.is_a?(Array)
-        expected.any? { |e| match(e) }
-      elsif end_of_input? || input[current, expected.size] != expected
-        false
-      else
-        @current += expected.size
-        true
-      end
-    end
-
-    def syntax_error(reason)
-      raise(
-        ::Code::Parser::Error::SyntaxError.new(
-          reason,
-          input: input,
-          line: line,
-          column: column,
-          offset_lines: offset_lines,
-          offset_columns: offset_columns
-        )
-      )
-    end
-
-    def line
-      input[0...start].count("\n")
-    end
-
-    def column
-      start - input.lines[0...line].map(&:size).sum
-    end
-
-    def offset_lines
-      input[0...current].count("\n") - line
-    end
-
-    def offset_columns
-      current - start + 1
-    end
-
-    def parse_code
-      parse_subclass(::Code::Parser)
     end
 
     def add(output)
@@ -173,19 +97,31 @@ class Code
       output
     end
 
-    def parse_subclass(subclass, **args)
-      code_parser =
-        subclass.new(
-          input,
-          start: start,
-          current: current,
-          expect_end_of_input: false,
-          **args
-        )
-      output = code_parser.parse
-      @current = code_parser.current
-      @end_of_input = code_parser.end_of_input
-      @start = code_parser.start
+    def next?(expected)
+      if expected.is_a?(Array)
+        expected.any? { |e| next?(e) }
+      else
+        input[cursor, expected.size] == expected
+      end
+    end
+
+    def match(expected)
+      if expected.is_a?(Array)
+        expected.any? { |e| match(e) }
+      else
+        if input[cursor, expected.size] == expected
+          @buffer += expected
+          true
+        else
+          false
+        end
+      end
+    end
+
+    def parse_subclass(subclass)
+      parser = subclass.new(input, cursor: cursor)
+      output = parser.parse
+      @cursor = parser.cursor
       output
     end
   end
