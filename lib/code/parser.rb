@@ -7,6 +7,10 @@ class Code
     DIGITS = %w[0 1 2 3 4 5 6 7 8 9]
     NON_ZERO_DIGITS = %w[1 2 3 4 5 6 7 8 9]
 
+    X = "x"
+    O = "o"
+    B = "b"
+
     SINGLE_QUOTE = "'"
     DOUBLE_QUOTE = '"'
     OPENING_CURLY_BRACKET = "{"
@@ -29,6 +33,7 @@ class Code
     LESSER = "<"
     AMPERSAND = "&"
     PIPE = "|"
+    UNDERSCORE = "_"
 
     WHITESPACE = [SPACE, NEWLINE]
 
@@ -142,6 +147,14 @@ class Code
         expected.any? { |e| next?(e) }
       else
         input[cursor, expected.size] == expected
+      end
+    end
+
+    def next_next?(expected)
+      if expected.is_a?(Array)
+        expected.any? { |e| next_next?(e) }
+      else
+        input[cursor + 1, expected.size] == expected
       end
     end
 
