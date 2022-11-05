@@ -55,6 +55,7 @@ class Code
 
     NOTHING_KEYWORDS = [NOTHING_KEYWORD, NULL_KEYWORD, NIL_KEYWORD]
     BOOLEAN_KEYWORDS = [TRUE_KEYWORD, FALSE_KEYWORD]
+    KEYWORDS = NOTHING_KEYWORDS + BOOLEAN_KEYWORDS + [DO_KEYWORD, END_KEYWORD]
 
     SPECIAL = [
       SINGLE_QUOTE, DOUBLE_QUOTE, OPENING_CURLY_BRACKET, CLOSING_CURLY_BRACKET,
@@ -82,8 +83,8 @@ class Code
     def parse
       output = parse_subclass(::Code::Parser::Code)
 
-      if check_end_of_input && cursor > input.size
-        syntax_error("Unexpected end of input (parse at position #{cursor})")
+      if check_end_of_input && cursor != input.size
+        syntax_error("Unexpected end of input")
       end
 
       output
@@ -127,7 +128,7 @@ class Code
         @buffer += input[cursor, n]
         @cursor += n
       else
-        syntax_error("Unexpected end of input (consume at position #{cursor})")
+        syntax_error("Unexpected end of input")
       end
     end
 
