@@ -37,18 +37,8 @@ class Code
 
     WHITESPACE = [SPACE, NEWLINE]
 
-    SPECIAL_BELL = "\\a"
-    SPECIAL_BELL_ESCAPED = "\a"
-    SPECIAL_BACKSPACE = "\\b"
-    SPECIAL_BACKSPACE_ESCAPED = "\b"
-    SPECIAL_CARRIAGE_RETURN = "\\r"
-    SPECIAL_CARRIAGE_RETURN_ESCAPED = "\r"
     SPECIAL_NEWLINE = "\\n"
     SPECIAL_NEWLINE_ESCAPED = "\n"
-    SPECIAL_SPACE = "\\s"
-    SPECIAL_SPACE_ESCAPED = "\s"
-    SPECIAL_TAB = "\\t"
-    SPECIAL_TAB_ESCAPED = "\t"
 
     NOTHING_KEYWORD = "nothing"
     NULL_KEYWORD = "null"
@@ -130,8 +120,10 @@ class Code
 
     def consume(n = 1)
       if cursor + n <= input.size
+        consumed = input[cursor, n]
         @buffer += input[cursor, n]
         @cursor += n
+        consumed
       else
         syntax_error("Unexpected end of input")
       end

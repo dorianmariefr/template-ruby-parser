@@ -14,7 +14,9 @@ class Code
 
             if next?(DOT) && next_next?(DIGITS)
               consume
-              consume while (next?(DIGITS) || next?(UNDERSCORE)) && !end_of_input?
+              while (next?(DIGITS) || next?(UNDERSCORE)) && !end_of_input?
+                consume
+              end
 
               { decimal: buffer.gsub(UNDERSCORE, EMPTY_STRING) }
             else
