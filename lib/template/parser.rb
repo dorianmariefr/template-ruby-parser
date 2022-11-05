@@ -27,7 +27,12 @@ class Template
             @buffer = ""
           end
 
-          code_parser = ::Code::Parser.new(input, current: current)
+          code_parser =
+            ::Code::Parser.new(
+              input,
+              current: current,
+              expect_end_of_input: false
+            )
           @output << { code: code_parser.parse }
           @current = code_parser.current
         else
