@@ -2,7 +2,7 @@ class Code
   class Parser
     class Statement < ::Code::Parser
       def parse
-        parse_subclass(::Code::Parser::String)
+        parse_subclass(::Code::Parser::List)
       end
     end
   end
