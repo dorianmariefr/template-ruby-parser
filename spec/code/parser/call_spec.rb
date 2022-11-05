@@ -4,8 +4,13 @@ RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
   [
-    ["true", [{ boolean: "true" }]],
-    ["false", [{ boolean: "false" }]]
+    ["a", [{ call: "a" }]],
+    ["admin?", [{ call: "admin?" }]],
+    ["update!", [{ call: "update!" }]],
+    [
+      "update!(user)",
+      [{ call: { arguments: [[{ call: "user" }]], name: "update!" } }]
+    ]
   ].each do |input, output|
     context input do
       let!(:input) { input }

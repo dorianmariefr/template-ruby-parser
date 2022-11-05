@@ -82,8 +82,8 @@ class Code
     def parse
       output = parse_subclass(::Code::Parser::Code)
 
-      if cursor > input.size && check_end_of_input
-        syntax_error("Unexpected end of input (parse)")
+      if check_end_of_input && cursor > input.size
+        syntax_error("Unexpected end of input (parse at position #{cursor})")
       end
 
       output
@@ -107,7 +107,7 @@ class Code
     end
 
     def line
-      input[0..cursor].count("\n")
+      input[0...cursor].count("\n")
     end
 
     def column
@@ -127,7 +127,7 @@ class Code
         @buffer += input[cursor, n]
         @cursor += n
       else
-        syntax_error("Unexpected end of input (consume)")
+        syntax_error("Unexpected end of input (consume at position #{cursor})")
       end
     end
 
@@ -163,6 +163,22 @@ class Code
       output = parser.parse
       @cursor = parser.cursor
       output
+    end
+
+    def parse_code
+      parse_subclass(::Code::Parser::Code)
+    end
+
+    def end_of_input?
+      cursor >= input.size
+    end
+
+    def buffer?
+      buffer != EMPTY_STRING
+    end
+
+    def buffer!
+      buffer.tap { @buffer = EMPTY_STRING }
     end
   end
 end
