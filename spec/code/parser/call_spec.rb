@@ -18,7 +18,7 @@ RSpec.describe ::Code::Parser do
       [
         {
           call: {
-            arguments: [[{ variable: { block: true, name: ":update" } }]],
+            arguments: [[{ variable: { block: true, name: "update", string: true } }]],
             name: "each"
           }
         }
@@ -28,7 +28,7 @@ RSpec.describe ::Code::Parser do
       "each do |user| update(user) end",
       [
         {
-          variable: {
+          call: {
             block: {
               arguments: [[{ variable: "user" }]],
               body: [
@@ -49,7 +49,7 @@ RSpec.describe ::Code::Parser do
       "each { |user| update(user) }",
       [
         {
-          variable: {
+          call: {
             block: {
               arguments: [[{ variable: "user" }]],
               body: [
@@ -70,7 +70,7 @@ RSpec.describe ::Code::Parser do
       "each{|user|update(user)}",
       [
         {
-          variable: {
+          call: {
             block: {
               arguments: [[{ variable: "user" }]],
               body: [

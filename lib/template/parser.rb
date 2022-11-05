@@ -1,48 +1,30 @@
 class Template
-  class Parser
-    def initialize(input)
-      @input = input
-      @current = 0
-      @output = []
-      @buffer = ""
-    end
-
-    def self.parse(input)
-      new(input).parse
-    end
-
+  class Parser < ::Code::Parser
     def parse
-      until at_end?
+      buffer = EMPTY_STRING
+      output = []
+
+      until end_of_input?
         c = advance
 
-        if c == "\\"
-          if match("{")
-            @buffer += "{"
-          else
-            @buffer += c
-          end
-        elsif c == "{"
-          if buffer != ""
-            @output << { text: buffer }
-            @buffer = ""
+        if c == OPENING_CURLY_BRACKET
+          if buffer != EMPTY_STRING
+            output << { text: buffer }
+            buffer = EMPTY_STRING
           end
 
-          code_parser =
-            ::Code::Parser.new(
-              input,
-              current: current,
-              expect_end_of_input: false
-            )
-          @output << { code: code_parser.parse }
-          @current = code_parser.current
+          @start = current
+          output << { code: parse_code }
+        elsif c == BACKSLASH && match(OPENING_CURLY_BRACKET)
+          buffer += OPENING_CURLY_BRACKET
         else
-          @buffer += c
+          buffer += c
         end
       end
 
-      if buffer != ""
-        @output << { text: buffer }
-        @buffer = ""
+      if buffer != EMPTY_STRING
+        output << { text: buffer }
+        buffer = EMPTY_STRING
       end
 
       output
@@ -50,24 +32,19 @@ class Template
 
     private
 
-    attr_reader :input, :current, :buffer, :output
-
-    def at_end?
-      current >= input.size
-    end
-
-    def advance
-      @current += 1
-      input[current - 1]
-    end
-
-    def match(expected)
-      if at_end? || input[current] != expected
-        false
-      else
-        @current += 1
-        true
-      end
+    def parse_subclass(subclass, **args)
+      code_parser =
+        subclass.new(
+          input,
+          start: start,
+          current: current,
+          expect_end_of_input: false,
+          **args
+        )
+      output = code_parser.parse
+      @current = code_parser.current
+      @start = code_parser.start
+      output
     end
   end
 end
