@@ -4,8 +4,11 @@ RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
   [
-    ["(1)", [{ group: [{ integer: "1" }] }]],
-    ["(a b)", [{ group: [{ variable: "a" }, { variable: "b" }] }]]
+    ["nothing", [{ nothing: "nothing" }]],
+    [
+      "nothing null nil",
+      [{ nothing: "nothing" }, { nothing: "null" }, { nothing: "nil" }]
+    ]
   ].each do |input, output|
     context input do
       let!(:input) { input }

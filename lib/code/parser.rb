@@ -30,6 +30,8 @@ class Code
     AMPERSAND = "&"
     PIPE = "|"
 
+    WHITESPACE = [SPACE, NEWLINE]
+
     SPECIAL_BELL = "\\a"
     SPECIAL_BELL_ESCAPED = "\a"
     SPECIAL_BACKSPACE = "\\b"
@@ -61,21 +63,27 @@ class Code
       OPENING_PARENTHESIS, CLOSING_PARENTHESIS, AMPERSAND, PIPE
     ]
 
-    def initialize(input, cursor: 0, buffer: EMPTY_STRING)
+    def initialize(
+      input,
+      cursor: 0,
+      buffer: EMPTY_STRING,
+      check_end_of_input: true
+    )
       @input = input
       @cursor = cursor
       @buffer = buffer
+      @check_end_of_input = check_end_of_input
     end
 
     def self.parse(input)
       new(input).parse
     end
 
-    def parse(check_end_of_input: true)
-      output = [parse_subclass(::Code::Parser::Nothing)]
+    def parse
+      output = parse_subclass(::Code::Parser::Code)
 
-      if cursor >= input.size && check_end_of_input
-        syntax_error("Unexpected end of input")
+      if cursor > input.size && check_end_of_input
+        syntax_error("Unexpected end of input (parse)")
       end
 
       output
@@ -83,12 +91,43 @@ class Code
 
     private
 
+    attr_reader :check_end_of_input
+
+    def syntax_error(message)
+      raise(
+        ::Code::Parser::Error::SyntaxError.new(
+          message,
+          input: input,
+          line: line,
+          column: column,
+          offset_lines: offset_lines,
+          offset_columns: offset_columns
+        )
+      )
+    end
+
+    def line
+      input[0..cursor].count("\n")
+    end
+
+    def column
+      cursor - input.lines[0...line].map(&:size).sum
+    end
+
+    def offset_lines
+      buffer.count("\n")
+    end
+
+    def offset_columns
+      buffer.size + 1
+    end
+
     def consume(n = 1)
       if cursor + n <= input.size
         @buffer += input[cursor, n]
         @cursor += n
       else
-        syntax_error("Unexpected end of input")
+        syntax_error("Unexpected end of input (consume)")
       end
     end
 
@@ -111,6 +150,7 @@ class Code
       else
         if input[cursor, expected.size] == expected
           @buffer += expected
+          @cursor += expected.size
           true
         else
           false
@@ -119,7 +159,7 @@ class Code
     end
 
     def parse_subclass(subclass)
-      parser = subclass.new(input, cursor: cursor)
+      parser = subclass.new(input, cursor: cursor, check_end_of_input: false)
       output = parser.parse
       @cursor = parser.cursor
       output

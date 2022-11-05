@@ -4,12 +4,8 @@ RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
   [
-    ["nothing", [{ nothing: "nothing" }]],
-    ["null", [{ nothing: "null" }]],
-    ["nil", [{ nothing: "nil" }]],
-    ["  nothing", [{ nothing: "nothing" }]],
-    [" \n null  ", [{ nothing: "null" }]],
-    ["nil \n ", [{ nothing: "nil" }]]
+    ["true", [{ boolean: "true" }]],
+    ["false", [{ boolean: "false" }]],
   ].each do |input, output|
     context input do
       let!(:input) { input }
