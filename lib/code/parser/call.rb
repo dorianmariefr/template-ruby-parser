@@ -25,13 +25,9 @@ class Code
         if match(OPENING_PARENTHESIS)
           arguments = []
 
-          code = parse_code
-          arguments << code if code
+          arguments << parse_argument
 
-          while match(COMMA) && !end_of_input?
-            code = parse_code
-            arguments << code if code
-          end
+          arguments << parse_argument while match(COMMA) && !end_of_input?
 
           match(CLOSING_PARENTHESIS)
         else
@@ -54,7 +50,7 @@ class Code
           {
             call: {
               name: identifier,
-              arguments: arguments,
+              arguments: arguments&.compact,
               splat: splat,
               block: block,
               block_arguments: block_arguments,
@@ -66,25 +62,38 @@ class Code
         end
       end
 
+      private
+
       def parse_block
         consume while next?(WHITESPACE)
 
         if match(PIPE)
           arguments = []
 
-          code = parse_code
-          arguments << code if code
+          arguments << parse_argument
 
-          while match(COMMA) && !end_of_input?
-            code = parse_code
-            arguments << code if code
-          end
+          arguments << parse_argument while match(COMMA) && !end_of_input?
 
           match(PIPE)
 
           [arguments, parse_code]
         else
           [nil, parse_code]
+        end
+      end
+
+      def parse_argument
+        previous_cursor = cursor
+        key = parse_subclass(::Code::Parser::Statement)
+        consume while next?(WHITESPACE)
+
+        if match(COLON) || match(EQUAL + GREATER)
+          value = parse_code
+          { key: key, value: value }
+        else
+          buffer!
+          @cursor = previous_cursor
+          parse_code
         end
       end
     end
