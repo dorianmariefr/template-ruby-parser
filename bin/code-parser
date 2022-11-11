@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+require "optparse"
+require_relative "../lib/code-ruby-parser"
+
+options = { }
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: bin/code [options]"
+
+  opts.on(
+    "-i INPUT",
+    "--input=INPUT",
+    "Input in the code language (String or File)"
+  ) do |input|
+    if File.exists?(input)
+      input = File.read(input)
+    end
+
+    options[:input] = input
+  end
+end.parse!
+
+input = options.fetch(:input, "")
+
+pp ::Code::Parser.parse(input)

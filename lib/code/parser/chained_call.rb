@@ -12,7 +12,7 @@ class Code
           while match(DOT) && other_right = parse_dictionnary
             chained_call << { right: other_right }
           end
-          chained_call
+          { chained_call: chained_call }
         else
           buffer!
           @cursor = previous_cursor

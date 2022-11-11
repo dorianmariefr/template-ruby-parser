@@ -27,11 +27,11 @@ RSpec.describe ::Code::Parser do
               [{ call: { name: "c", splat: :keyword } }],
               [{ call: { block: true, name: "d" } }]
             ],
-            block_arguments: [
-              [{ call: "e" }],
-              [{ call: { name: "f", splat: :regular } }],
-              [{ call: { name: "g", splat: :keyword } }],
-              [{ call: { block: true, name: "h" } }]
+            block_parameters: [
+              { name: "e" },
+              { name: "f", splat: :regular },
+              { name: "g", splat: :keyword },
+              { block: true, name: "h" }
             ],
             block_body: [
               { call: { arguments: [[{ call: "e" }]], name: "puts" } }

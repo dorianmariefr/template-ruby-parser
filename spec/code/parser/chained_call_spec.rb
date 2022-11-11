@@ -4,89 +4,112 @@ RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
   [
-    ["a.b", [[{ left: { call: "a" }, right: { call: "b" } }]]],
+    [
+      "a.b",
+      [{ chained_call: [{ left: { call: "a" }, right: { call: "b" } }] }]
+    ],
     [
       "a.b.c",
       [
-        [
-          { left: { call: "a" }, right: { call: "b" } },
-          { right: { call: "c" } }
-        ]
+        {
+          chained_call: [
+            { left: { call: "a" }, right: { call: "b" } },
+            { right: { call: "c" } }
+          ]
+        }
       ]
     ],
     [
       "a(1).b.c(2)",
       [
-        [
-          {
-            left: {
-              call: {
-                arguments: [[{ integer: 1 }]],
-                name: "a"
+        {
+          chained_call: [
+            {
+              left: {
+                call: {
+                  arguments: [[{ integer: 1 }]],
+                  name: "a"
+                }
+              },
+              right: {
+                call: "b"
               }
             },
-            right: {
-              call: "b"
-            }
-          },
-          { right: { call: { arguments: [[{ integer: 2 }]], name: "c" } } }
-        ]
+            { right: { call: { arguments: [[{ integer: 2 }]], name: "c" } } }
+          ]
+        }
       ]
     ],
     [
       "user.first_name",
-      [[{ left: { call: "user" }, right: { call: "first_name" } }]]
+      [
+        {
+          chained_call: [
+            { left: { call: "user" }, right: { call: "first_name" } }
+          ]
+        }
+      ]
     ],
-    ["User.all", [[{ left: { call: "User" }, right: { call: "all" } }]]],
+    [
+      "User.all",
+      [{ chained_call: [{ left: { call: "User" }, right: { call: "all" } }] }]
+    ],
     [
       "User.each do |user| user.update(created_at: Time.now) end",
       [
-        [
-          {
-            left: {
-              call: "User"
-            },
-            right: {
-              call: {
-                block_arguments: [[{ call: "user" }]],
-                block_body: [
-                  [
+        {
+          chained_call: [
+            {
+              left: {
+                call: "User"
+              },
+              right: {
+                call: {
+                  block_body: [
                     {
-                      left: {
-                        call: "user"
-                      },
-                      right: {
-                        call: {
-                          arguments: [
-                            {
-                              key: {
-                                call: "created_at"
-                              },
-                              value: [
-                                [
-                                  {
-                                    left: {
-                                      call: "Time"
-                                    },
-                                    right: {
-                                      call: "now"
+                      chained_call: [
+                        {
+                          left: {
+                            call: "user"
+                          },
+                          right: {
+                            call: {
+                              arguments: [
+                                {
+                                  default: [
+                                    {
+                                      chained_call: [
+                                        {
+                                          left: {
+                                            call: "Time"
+                                          },
+                                          right: {
+                                            call: "now"
+                                          }
+                                        }
+                                      ]
                                     }
+                                  ],
+                                  keyword: true,
+                                  statement: {
+                                    call: "created_at"
                                   }
-                                ]
-                              ]
+                                }
+                              ],
+                              name: "update"
                             }
-                          ],
-                          name: "update"
+                          }
                         }
-                      }
+                      ]
                     }
-                  ]
-                ],
-                name: "each"
+                  ],
+                  block_parameters: [{ name: "user" }],
+                  name: "each"
+                }
               }
             }
-          }
-        ]
+          ]
+        }
       ]
     ]
   ].each do |input, output|
