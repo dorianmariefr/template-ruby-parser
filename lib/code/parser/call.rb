@@ -2,25 +2,8 @@ class Code
   class Parser
     class Call < ::Code::Parser
       def parse
-        return if end_of_input?
-        return if next?(SPECIAL) && !next?(AMPERSAND) && !next?(ASTERISK)
-        return if next?(KEYWORDS)
-
-        block = match(AMPERSAND) || nil
-
-        if match(ASTERISK + ASTERISK)
-          splat = :keyword
-        elsif match(ASTERISK)
-          splat = :regular
-        else
-          splat = nil
-        end
-
-        buffer!
-
-        consume while !next?(SPECIAL) && !end_of_input?
-
-        identifier = buffer!
+        identifier = parse_subclass(::Code::Parser::Identifier)
+        return unless identifier
 
         if match(OPENING_PARENTHESIS)
           arguments = []
@@ -46,19 +29,18 @@ class Code
           block_arguments, block_body = nil, nil
         end
 
-        if arguments || block || splat || block_arguments || block_body
+        if identifier[:block].nil? && identifier[:splat].nil? && !arguments &&
+             !block_arguments && !block_body
+          { call: identifier[:name] }
+        else
           {
             call: {
-              name: identifier,
+              **identifier,
               arguments: arguments&.compact,
-              splat: splat,
-              block: block,
               block_arguments: block_arguments,
               block_body: block_body
             }.compact
           }
-        else
-          { call: identifier }
         end
       end
 

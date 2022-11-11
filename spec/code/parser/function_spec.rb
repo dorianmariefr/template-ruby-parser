@@ -41,6 +41,26 @@ RSpec.describe ::Code::Parser do
           }
         }
       ]
+    ],
+    [
+      "(a?, b! = 1, c?:, d?: 2, *e?, *f!, **g?, **h!) => { }",
+      [
+        {
+          function: {
+            body: [],
+            parameters: [
+              { name: "a?" },
+              { default: [{ integer: 1 }], name: "b!" },
+              { keyword: true, name: "c?" },
+              { default: [{ integer: 2 }], keyword: true, name: "d?" },
+              { name: "e?", splat: :regular },
+              { name: "f!", splat: :regular },
+              { name: "g?", splat: :keyword },
+              { name: "h!", splat: :keyword }
+            ]
+          }
+        }
+      ]
     ]
   ].each do |input, output|
     context input do

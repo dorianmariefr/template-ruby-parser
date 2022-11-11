@@ -47,26 +47,18 @@ class Code
       end
 
       def parse_keyword_parameter
-        return if end_of_input?
-        return if next?(SPECIAL) && !next?(AMPERSAND) && !next?(ASTERISK)
-        return if next?(KEYWORDS)
-
         previous_cursor = cursor
 
-        buffer!
-
-        consume while !next?(SPECIAL) && !end_of_input?
-
-        key = buffer!
+        key = parse_subclass(::Code::Parser::Identifier)
 
         consume while next?(WHITESPACE)
 
-        if match(COLON) || match(EQUAL + GREATER)
+        if key && (match(COLON) || match(EQUAL + GREATER))
           default = parse_code
 
           default = nil if default.empty?
 
-          { name: key, default: default, keyword: true }.compact
+          { default: default, keyword: true, **key }.compact
         else
           @cursor = previous_cursor
           buffer!
@@ -75,25 +67,8 @@ class Code
       end
 
       def parse_regular_parameter
-        return if end_of_input?
-        return if next?(SPECIAL) && !next?(AMPERSAND) && !next?(ASTERISK)
-        return if next?(KEYWORDS)
-
-        block = match(AMPERSAND) || nil
-
-        if match(ASTERISK + ASTERISK)
-          splat = :keyword
-        elsif match(ASTERISK)
-          splat = :regular
-        else
-          splat = nil
-        end
-
-        buffer!
-
-        consume while !next?(SPECIAL) && !end_of_input?
-
-        identifier = buffer!
+        identifier = parse_subclass(::Code::Parser::Identifier)
+        return if !identifier
 
         consume while next?(WHITESPACE)
 
@@ -103,12 +78,7 @@ class Code
           default = nil
         end
 
-        {
-          name: identifier,
-          splat: splat,
-          block: block,
-          default: default
-        }.compact
+        { default: default, **identifier }.compact
       end
     end
   end
