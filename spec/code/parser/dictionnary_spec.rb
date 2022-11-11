@@ -29,7 +29,7 @@ RSpec.describe ::Code::Parser do
     "{ a: 1, b => /* comment */ 2 }",
     "{ a: 1, b => 2 /* comment */ }",
     "{ /* comment */ **kargs }",
-    "{ **kargs /* comment */ }",
+    "{ **kargs /* comment */ }"
   ].each do |input|
     context input do
       let!(:input) { input }
