@@ -7,9 +7,9 @@ class Code
         match(OPENING_PARENTHESIS)
         parameters = parse_parameters
         match(CLOSING_PARENTHESIS)
-        consume while next?(WHITESPACE)
+        parse_comments
         if match(EQUAL + GREATER)
-          consume while next?(WHITESPACE)
+          parse_comments
           if match(OPENING_CURLY_BRACKET)
             body = parse_code
             match(CLOSING_CURLY_BRACKET)
@@ -33,14 +33,14 @@ class Code
       def parse_parameters
         parameters = []
 
-        consume while next?(WHITESPACE)
+        parse_comments
         parameters << (parse_keyword_parameter || parse_regular_parameter)
-        consume while next?(WHITESPACE)
+        parse_comments
 
         while match(COMMA) && !end_of_input?
-          consume while next?(WHITESPACE)
+          parse_comments
           parameters << (parse_keyword_parameter || parse_regular_parameter)
-          consume while next?(WHITESPACE)
+          parse_comments
         end
 
         parameters.compact.empty? ? nil : parameters.compact
@@ -51,7 +51,7 @@ class Code
 
         key = parse_subclass(::Code::Parser::Identifier)
 
-        consume while next?(WHITESPACE)
+        parse_comments
 
         if key && (match(COLON) || match(EQUAL + GREATER))
           default = parse_code
@@ -70,7 +70,7 @@ class Code
         identifier = parse_subclass(::Code::Parser::Identifier)
         return if !identifier
 
-        consume while next?(WHITESPACE)
+        parse_comments
 
         if match(EQUAL)
           default = parse_code

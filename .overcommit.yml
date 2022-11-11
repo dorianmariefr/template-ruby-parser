@@ -1,0 +1,4 @@
+PreCommit:
+  Format:
+    enabled: true
+    command: ["bin/format"]

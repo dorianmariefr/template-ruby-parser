@@ -21,67 +21,71 @@ class Code
           arguments = nil
         end
 
-        consume while next?(WHITESPACE)
+        comments = parse_comments
 
         if match(DO_KEYWORD)
-          block_parameters, block_body = parse_block
+          block = parse_block
           match(END_KEYWORD)
         elsif match(OPENING_CURLY_BRACKET)
-          block_parameters, block_body = parse_block
+          block = parse_block
           match(CLOSING_CURLY_BRACKET)
         else
-          block_parameters, block_body = nil, nil
+          block = nil
         end
 
-        if identifier[:block].nil? && identifier[:splat].nil? && !arguments &&
-             !block_parameters && !block_body
-          { call: identifier[:name] }
-        else
-          {
-            call: {
-              **identifier,
-              arguments: arguments,
-              block_parameters: block_parameters,
-              block_body: block_body
-            }.compact
-          }
-        end
+        {
+          call: {
+            **identifier,
+            arguments: arguments,
+            block: block,
+            comments: comments
+          }.compact
+        }
       end
 
       private
 
       def parse_block
-        consume while next?(WHITESPACE)
+        comments = parse_comments
 
         if match(PIPE)
           parameters = []
 
-          consume while next?(WHITESPACE)
           parameters << (parse_keyword_parameter || parse_regular_parameter)
 
           while match(COMMA) && !end_of_input?
-            consume while next?(WHITESPACE)
             parameters << (parse_keyword_parameter || parse_regular_parameter)
           end
 
           match(PIPE)
 
-          [parameters.compact, parse_code]
+          {
+            comments: comments,
+            parameters: parameters.compact,
+            body: parse_code
+          }.compact
         else
-          [nil, parse_code]
+          { comments: comments, body: parse_code }.compact
         end
       end
 
       def parse_keyword_argument
         previous_cursor = cursor
 
+        before_comments = parse_comments
         key = parse_subclass(::Code::Parser::Statement)
-        consume while next?(WHITESPACE)
+        after_comments = parse_comments
 
         if key && match(COLON) || match(EQUAL + GREATER)
           default = parse_code
           default = nil if default.empty?
-          { default: default, keyword: true, statement: key }
+          {
+            before_comments: before_comments,
+            after_comments: after_comments,
+            default: default,
+            keyword: true,
+            statement: key
+          }.compact
         else
           @cursor = previous_cursor
           buffer!
@@ -98,13 +102,20 @@ class Code
       def parse_keyword_parameter
         previous_cursor = cursor
 
+        before_comments = parse_comments
         key = parse_subclass(::Code::Parser::Identifier)
-        consume while next?(WHITESPACE)
+        after_comments = parse_comments
 
         if key && match(COLON) || match(EQUAL + GREATER)
           default = parse_code
           default = nil if default.empty?
-          { default: default, keyword: true, **key }
+          {
+            before_comments: before_comments,
+            after_comments: after_comments,
+            default: default,
+            keyword: true,
+            **key
+          }.compact
         else
           @cursor = previous_cursor
           buffer!
@@ -113,18 +124,33 @@ class Code
       end
 
       def parse_regular_parameter
+        previous_cursor = cursor
+        before_comments = parse_comments
         identifier = parse_subclass(::Code::Parser::Identifier)
-        return unless identifier
+        if identifier
+          after_comments = parse_comments
 
-        consume while next?(WHITESPACE)
+          if match(EQUAL)
+            default = parse_code
+            default = nil if default.empty?
 
-        if match(EQUAL)
-          default = parse_code
-          default = nil if default.empty?
-
-          { default: default, **identifier }
+            {
+              before_comments: before_comments,
+              after_comments: after_comments,
+              default: default,
+              **identifier
+            }.compact
+          else
+            {
+              before_comments: before_comments,
+              after_comments: after_comments,
+              **identifier
+            }.compact
+          end
         else
-          identifier
+          @cursor = previous_cursor
+          buffer!
+          return
         end
       end
     end

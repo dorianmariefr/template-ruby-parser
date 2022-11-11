@@ -3,14 +3,11 @@ require "spec_helper"
 RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
-  [
-    ["!a", [{ negation: { call: "a" } }]],
-    ["!!a", [{ negation: { negation: { call: "a" } } }]]
-  ].each do |input, output|
+  %w[!a !!a !!!!a].each do |input|
     context input do
       let!(:input) { input }
 
-      it { expect(subject).to eq(output) }
+      it { expect { subject }.to_not raise_error }
     end
   end
 end

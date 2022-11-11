@@ -4,48 +4,46 @@ RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
   [
-    ["a", [{ call: "a" }]],
-    ["admin?", [{ call: "admin?" }]],
-    ["update!", [{ call: "update!" }]],
-    ["*args", [{ call: { name: "args", splat: :regular } }]],
-    ["**kargs", [{ call: { name: "kargs", splat: :keyword } }]],
-    ["&block", [{ call: { block: true, name: "block" } }]],
-    [
-      "update!(user)",
-      [{ call: { arguments: [[{ call: "user" }]], name: "update!" } }]
-    ],
-    ["each{}", [{ call: { block_body: [], name: "each" } }]],
-    ["each do end", [{ call: { block_body: [], name: "each" } }]],
-    [
-      "render(a, *b, **c, &d) { |e, *f, **g, &h| puts(e) }",
-      [
-        {
-          call: {
-            arguments: [
-              [{ call: "a" }],
-              [{ call: { name: "b", splat: :regular } }],
-              [{ call: { name: "c", splat: :keyword } }],
-              [{ call: { block: true, name: "d" } }]
-            ],
-            block_parameters: [
-              { name: "e" },
-              { name: "f", splat: :regular },
-              { name: "g", splat: :keyword },
-              { block: true, name: "h" }
-            ],
-            block_body: [
-              { call: { arguments: [[{ call: "e" }]], name: "puts" } }
-            ],
-            name: "render"
-          }
-        }
-      ]
-    ]
-  ].each do |input, output|
+    "a",
+    "admin?",
+    "update!",
+    "*args",
+    "**kargs",
+    "&block",
+    "update!(user)",
+    "each{}",
+    "each do end",
+    "render(a, *b, **c, &d) { |e, *f, **g, &h| puts(e) }",
+    "&render {}"
+  ].each do |input|
     context input do
       let!(:input) { input }
 
-      it { expect(subject).to eq(output) }
+      it { expect { subject }.to_not raise_error }
+    end
+  end
+
+  [
+    "update! /* comment */ { }",
+    "each{/* comment */}",
+    "render(/* comment */ a)",
+    "render(a /* comment */)",
+    "render(a, /* comment */ b)",
+    "render(a, b /* comment */)",
+    "render(/* comment */ a: 1)",
+    "render(a: 1 /* comment */)",
+    "render(a: 1, /* comment */ b: 2)",
+    "render(a: 1, b: 2 /* comment */)",
+    "render { /* comment */ |a, b| }",
+    "render { |/* comment */ a, b| }",
+    "render { |a /* comment */, b| }",
+    "render { |a: 1, /* comment */ b: 2| }",
+    "render { |a: 1, b: 2 /* comment */| }"
+  ].each do |input|
+    context input do
+      let!(:input) { input }
+
+      it { expect(subject.to_json).to include("comment") }
     end
   end
 end

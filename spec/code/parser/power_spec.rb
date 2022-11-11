@@ -3,42 +3,11 @@ require "spec_helper"
 RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
-  [
-    ["a ** b", [{ power: { left: { call: "a" }, right: { call: "b" } } }]],
-    [
-      "a ** b ** c ** d",
-      [
-        {
-          power: {
-            left: {
-              call: "a"
-            },
-            right: {
-              power: {
-                left: {
-                  call: "b"
-                },
-                right: {
-                  power: {
-                    left: {
-                      call: "c"
-                    },
-                    right: {
-                      call: "d"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ]
-    ]
-  ].each do |input, output|
+  ["a ** b", "a ** b ** c ** d"].each do |input|
     context input do
       let!(:input) { input }
 
-      it { expect(subject).to eq(output) }
+      it { expect { subject }.to_not raise_error }
     end
   end
 end

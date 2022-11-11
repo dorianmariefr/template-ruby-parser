@@ -18,11 +18,11 @@ class Code
       end
 
       def parse_key_value
-        consume while next?(WHITESPACE)
+        parse_comments
 
         key = parse_subclass(::Code::Parser::Statement)
 
-        consume while next?(WHITESPACE)
+        parse_comments
 
         return unless key
 

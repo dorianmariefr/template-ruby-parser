@@ -4,9 +4,9 @@ class Code
       def parse
         previous_cursor = cursor
         left = parse_subclass(::Code::Parser::Negation)
-        consume while next?(WHITESPACE)
+        parse_comments
         if match(ASTERISK + ASTERISK)
-          consume while next?(WHITESPACE)
+          parse_comments
           right = parse_subclass(::Code::Parser::Power)
           if right
             { power: { left: left, right: right } }

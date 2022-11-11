@@ -3,17 +3,11 @@ require "spec_helper"
 RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
-  [
-    ["nothing", [{ nothing: "nothing" }]],
-    [
-      "nothing null nil",
-      [{ nothing: "nothing" }, { nothing: "null" }, { nothing: "nil" }]
-    ]
-  ].each do |input, output|
+  ["nothing", "nothing null nil"].each do |input|
     context input do
       let!(:input) { input }
 
-      it { expect(subject).to eq(output) }
+      it { expect { subject }.to_not raise_error }
     end
   end
 end

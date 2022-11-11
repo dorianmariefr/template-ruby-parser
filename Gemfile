@@ -1,4 +1,4 @@
 source "https://rubygems.org"
 
 gem "rspec"
-gem "prettier"
+gem "syntax_tree"

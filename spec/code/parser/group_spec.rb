@@ -3,21 +3,11 @@ require "spec_helper"
 RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
-  [
-    ["()", [{ group: [] }]],
-    [
-      "(true nothing)",
-      [{ group: [{ boolean: "true" }, { nothing: "nothing" }] }]
-    ],
-    [
-      "(true (nothing))",
-      [{ group: [{ boolean: "true" }, { group: [{ nothing: "nothing" }] }] }]
-    ]
-  ].each do |input, output|
+  ["()", "(true nothing)", "(true (nothing))"].each do |input|
     context input do
       let!(:input) { input }
 
-      it { expect(subject).to eq(output) }
+      it { expect { subject }.to_not raise_error }
     end
   end
 end

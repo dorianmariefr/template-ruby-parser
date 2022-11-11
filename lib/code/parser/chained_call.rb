@@ -4,10 +4,10 @@ class Code
       def parse
         previous_cursor = cursor
         left = parse_dictionnary
-        consume while next?(WHITESPACE)
+        parse_comments
 
         if left && match(DOT) && (right = parse_dictionnary)
-          consume while next?(WHITESPACE)
+          parse_comments
           chained_call = [{ left: left, right: right }]
           while match(DOT) && other_right = parse_dictionnary
             chained_call << { right: other_right }

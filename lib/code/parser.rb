@@ -178,6 +178,10 @@ class Code
       parse_subclass(::Code::Parser::Code)
     end
 
+    def parse_comments
+      parse_subclass(::Code::Parser::Comments)
+    end
+
     def end_of_input?
       cursor >= input.size
     end

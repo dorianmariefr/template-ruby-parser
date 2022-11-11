@@ -6,14 +6,14 @@ class Code
         return if next?(SPECIAL) && !next?(AMPERSAND) && !next?(ASTERISK)
         return if next?(KEYWORDS)
 
-        block = match(AMPERSAND) || nil
-
-        if match(ASTERISK + ASTERISK)
-          splat = :keyword
+        if match(AMPERSAND)
+          kind = :block
+        elsif match(ASTERISK + ASTERISK)
+          kind = :keyword
         elsif match(ASTERISK)
-          splat = :regular
+          kind = :regular
         else
-          splat = nil
+          kind = nil
         end
 
         buffer!
@@ -24,7 +24,7 @@ class Code
 
         name = buffer!
 
-        { name: name, block: block, splat: splat }.compact
+        { name: name, kind: kind }.compact
       end
     end
   end
