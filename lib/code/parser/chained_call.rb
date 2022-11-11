@@ -4,18 +4,31 @@ class Code
       def parse
         previous_cursor = cursor
         left = parse_dictionnary
-        parse_comments
+        before_comments = parse_comments
 
-        if left && match(DOT) && (right = parse_dictionnary)
-          parse_comments
-          chained_call = [{ left: left, right: right }]
-          while match(DOT) && other_right = parse_dictionnary
-            chained_call << { right: other_right }
+        if left && match(DOT)
+          after_comments = parse_comments
+          right = parse_dictionnary
+          if right
+            chained_call = [{ left: left, right: right }]
+            while match(DOT) && other_right = parse_dictionnary
+              chained_call << { right: other_right }
+            end
+            {
+              chained_call: {
+                calls: chained_call,
+                before_comments: before_comments,
+                after_comments: after_comments
+              }.compact
+            }
+          else
+            @cursor = previous_cursor
+            buffer!
+            parse_dictionnary
           end
-          { chained_call: chained_call }
         else
-          buffer!
           @cursor = previous_cursor
+          buffer!
           parse_dictionnary
         end
       end
