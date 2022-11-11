@@ -162,7 +162,7 @@ class Code
         if input[cursor, expected.size] == expected
           @buffer += expected
           @cursor += expected.size
-          true
+          expected
         else
           false
         end

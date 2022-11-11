@@ -3,17 +3,21 @@ class Code
     class Identifier < ::Code::Parser
       def parse
         return if end_of_input?
-        return if next?(SPECIAL) && !next?(AMPERSAND) && !next?(ASTERISK)
-        return if next?(KEYWORDS)
 
-        if match(AMPERSAND)
+        previous_cursor = cursor
+
+        if match(AMPERSAND) && !next?(SPECIAL)
           kind = :block
-        elsif match(ASTERISK + ASTERISK)
+        elsif match(ASTERISK + ASTERISK) && !next?(SPECIAL)
           kind = :keyword
-        elsif match(ASTERISK)
+        elsif match(ASTERISK) && !next?(SPECIAL)
           kind = :regular
-        else
+        elsif !next?(SPECIAL)
           kind = nil
+        else
+          @cursor = previous_cursor
+          buffer!
+          return
         end
 
         buffer!
