@@ -170,7 +170,8 @@ class Code
     end
 
     def parse_subclass(subclass, **kargs)
-      parser = subclass.new(input, cursor: cursor, check_end_of_input: false, **kargs)
+      parser =
+        subclass.new(input, cursor: cursor, check_end_of_input: false, **kargs)
       output = parser.parse
       @cursor = parser.cursor
       output

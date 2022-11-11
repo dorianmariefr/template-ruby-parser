@@ -31,11 +31,7 @@ class Code
           left
         else
           {
-            operation: {
-              left: left,
-              comments: comments,
-              right: right
-            }.compact
+            operation: { left: left, comments: comments, right: right }.compact
           }
         end
       end
