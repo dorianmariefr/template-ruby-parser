@@ -4,12 +4,19 @@ class Code
       def parse
         previous_cursor = cursor
         left = parse_subclass(::Code::Parser::Negation)
-        parse_comments
+        comments_before = parse_comments
         if match(ASTERISK + ASTERISK)
-          parse_comments
+          comments_after = parse_comments
           right = parse_subclass(::Code::Parser::Power)
           if right
-            { power: { left: left, right: right } }
+            {
+              power: {
+                left: left,
+                right: right,
+                comments_before: comments_before,
+                comments_after: comments_after
+              }.compact
+            }
           else
             @cursor = previous_cursor
             buffer!
