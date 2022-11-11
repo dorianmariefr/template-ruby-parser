@@ -72,16 +72,16 @@ class Code
       def parse_keyword_argument
         previous_cursor = cursor
 
-        before_comments = parse_comments
+        comments_before = parse_comments
         key = parse_subclass(::Code::Parser::Statement)
-        after_comments = parse_comments
+        comments_after = parse_comments
 
         if key && match(COLON) || match(EQUAL + GREATER)
           default = parse_code
           default = nil if default.empty?
           {
-            before_comments: before_comments,
-            after_comments: after_comments,
+            comments_before: comments_before,
+            comments_after: comments_after,
             default: default,
             keyword: true,
             statement: key
@@ -102,16 +102,16 @@ class Code
       def parse_keyword_parameter
         previous_cursor = cursor
 
-        before_comments = parse_comments
+        comments_before = parse_comments
         key = parse_subclass(::Code::Parser::Identifier)
-        after_comments = parse_comments
+        comments_after = parse_comments
 
         if key && match(COLON) || match(EQUAL + GREATER)
           default = parse_code
           default = nil if default.empty?
           {
-            before_comments: before_comments,
-            after_comments: after_comments,
+            comments_before: comments_before,
+            comments_after: comments_after,
             default: default,
             keyword: true,
             **key
@@ -125,25 +125,25 @@ class Code
 
       def parse_regular_parameter
         previous_cursor = cursor
-        before_comments = parse_comments
+        comments_before = parse_comments
         identifier = parse_subclass(::Code::Parser::Identifier)
         if identifier
-          after_comments = parse_comments
+          comments_after = parse_comments
 
           if match(EQUAL)
             default = parse_code
             default = nil if default.empty?
 
             {
-              before_comments: before_comments,
-              after_comments: after_comments,
+              comments_before: comments_before,
+              comments_after: comments_after,
               default: default,
               **identifier
             }.compact
           else
             {
-              before_comments: before_comments,
-              after_comments: after_comments,
+              comments_before: comments_before,
+              comments_after: comments_after,
               **identifier
             }.compact
           end

@@ -4,10 +4,10 @@ class Code
       def parse
         previous_cursor = cursor
         left = parse_dictionnary
-        before_comments = parse_comments
+        comments_before = parse_comments
 
         if left && match(DOT)
-          after_comments = parse_comments
+          comments_after = parse_comments
           right = parse_dictionnary
           if right
             chained_call = [{ left: left, right: right }]
@@ -17,8 +17,8 @@ class Code
             {
               chained_call: {
                 calls: chained_call,
-                before_comments: before_comments,
-                after_comments: after_comments
+                comments_before: comments_before,
+                comments_after: comments_after
               }.compact
             }
           else

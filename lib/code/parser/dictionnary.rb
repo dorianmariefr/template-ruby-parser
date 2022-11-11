@@ -5,31 +5,42 @@ class Code
         if match(OPENING_CURLY_BRACKET)
           dictionnary = []
 
+          comments = parse_comments
+
           dictionnary << parse_key_value
 
           dictionnary << parse_key_value while match(COMMA) && !end_of_input?
 
           match(CLOSING_CURLY_BRACKET)
 
-          { dictionnary: dictionnary.compact }
+          { dictionnary: dictionnary.compact, comments: comments }
         else
           parse_subclass(::Code::Parser::List)
         end
       end
 
       def parse_key_value
-        parse_comments
+        comments_before = parse_comments
 
         key = parse_subclass(::Code::Parser::Statement)
 
-        parse_comments
+        comments_after = parse_comments
 
         return unless key
 
         if match(COLON) || match(EQUAL + GREATER)
-          { key: key, value: parse_code }
+          {
+            key: key,
+            value: parse_code,
+            comments_before: comments_before,
+            comments_after: comments_after
+          }.compact
         else
-          { key: key }
+          {
+            key: key,
+            comments_before: comments_before,
+            comments_after: comments_after
+          }.compact
         end
       end
     end
