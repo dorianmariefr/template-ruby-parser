@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
-  ["-1", "+a", "-+--1"].each do |input|
+  %w[-1 +a -+--1].each do |input|
     context input do
       let!(:input) { input }
 
@@ -11,9 +11,7 @@ RSpec.describe ::Code::Parser do
     end
   end
 
-  [
-    "- /* comment */ 1",
-  ].each do |input|
+  ["- /* comment */ 1"].each do |input|
     context input do
       let!(:input) { input }
 

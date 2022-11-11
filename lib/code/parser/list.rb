@@ -6,7 +6,6 @@ class Code
           list = []
 
           list << parse_code
-
           list << parse_code while match(COMMA) && !end_of_input?
 
           match(CLOSING_SQUARE_BRACKET)

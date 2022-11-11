@@ -11,10 +11,7 @@ RSpec.describe ::Code::Parser do
     end
   end
 
-  [
-    "1 /* comment */ ** 2",
-    "1 ** /* comment */ 2",
-  ].each do |input|
+  ["1 /* comment */ ** 2", "1 ** /* comment */ 2"].each do |input|
     context input do
       let!(:input) { input }
 
