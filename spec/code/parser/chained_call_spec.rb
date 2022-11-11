@@ -19,14 +19,14 @@ RSpec.describe ::Code::Parser do
   end
 
   [
-    "a /* comment */ . b",
-    "a . /* comment */ b",
-    "a . # cool\n /* comment */ b"
+    "a /* cool */ . b",
+    "a . /* cool */ b",
+    "a . # cool\n /* cool */ b"
   ].each do |input|
     context input do
       let!(:input) { input }
 
-      it { expect(subject.to_json).to include("comment") }
+      it { expect(subject.to_json).to include("cool") }
     end
   end
 end

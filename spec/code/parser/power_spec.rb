@@ -11,11 +11,11 @@ RSpec.describe ::Code::Parser do
     end
   end
 
-  ["1 /* comment */ ** 2", "1 ** /* comment */ 2"].each do |input|
+  ["1 /* cool */ ** 2", "1 ** /* cool */ 2"].each do |input|
     context input do
       let!(:input) { input }
 
-      it { expect(subject.to_json).to include("comment") }
+      it { expect(subject.to_json).to include("cool") }
     end
   end
 end

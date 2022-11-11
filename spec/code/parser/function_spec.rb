@@ -18,26 +18,26 @@ RSpec.describe ::Code::Parser do
   end
 
   [
-    "(/* comment */)=>{}",
-    "(/* comment */ a)=>{}",
-    "(/* comment */ a:)=>{}",
-    "(a /* comment */ )=>{}",
-    "(a /* comment */ :)=>{}",
-    "(a /* comment */ => 1)=>{}",
-    "(a = /* comment */ 1)=>{}",
-    "(a = 1 /* comment */)=>{}",
-    "(a, /* comment */ b)=>{}",
-    "(a, b /* comment */)=>{}",
-    "(a, b /* comment */ = 1)=>{}",
-    "(a, b: /* comment */)=>{}",
-    "() /* comment */ => {}",
-    "() => /* comment */ {}",
-    "() => { /* comment */ }"
+    "(/* cool */)=>{}",
+    "(/* cool */ a)=>{}",
+    "(/* cool */ a:)=>{}",
+    "(a /* cool */ )=>{}",
+    "(a /* cool */ :)=>{}",
+    "(a /* cool */ => 1)=>{}",
+    "(a = /* cool */ 1)=>{}",
+    "(a = 1 /* cool */)=>{}",
+    "(a, /* cool */ b)=>{}",
+    "(a, b /* cool */)=>{}",
+    "(a, b /* cool */ = 1)=>{}",
+    "(a, b: /* cool */)=>{}",
+    "() /* cool */ => {}",
+    "() => /* cool */ {}",
+    "() => { /* cool */ }"
   ].each do |input|
     context input do
       let!(:input) { input }
 
-      it { expect(subject.to_json).to include("comment") }
+      it { expect(subject.to_json).to include("cool") }
     end
   end
 end

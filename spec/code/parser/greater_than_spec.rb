@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
-  ["a * b", "a / b", "(a / b) / c", "a / (b / c)"].each do |input|
+  ["a > b", "a > b > c", "a < b", "a >= b", "a <= b"].each do |input|
     context input do
       let!(:input) { input }
 
@@ -12,10 +12,10 @@ RSpec.describe ::Code::Parser do
   end
 
   [
-    "a /* cool */ * b",
-    "a * /* cool */ b",
-    "a * b * c /* cool */",
-    "a * b * /* cool */ c"
+    "a /* cool */ > b",
+    "a < /* cool */ b",
+    "a > b < c /* cool */",
+    "a < b > /* cool */ c"
   ].each do |input|
     context input do
       let!(:input) { input }

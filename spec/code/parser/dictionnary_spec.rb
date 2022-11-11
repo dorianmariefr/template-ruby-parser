@@ -19,22 +19,22 @@ RSpec.describe ::Code::Parser do
   end
 
   [
-    "{ /* comment */ }",
-    "{ a /* comment */ : 1",
-    "{ a /* comment */ => 1",
-    "{ a: 1 /* comment */ }",
-    "{ a: 1, /* comment */ b: 2 }",
-    "{ a: 1, b /* comment */ : 2 }",
-    "{ a: 1, b /* comment */ => 2 }",
-    "{ a: 1, b => /* comment */ 2 }",
-    "{ a: 1, b => 2 /* comment */ }",
-    "{ /* comment */ **kargs }",
-    "{ **kargs /* comment */ }"
+    "{ /* cool */ }",
+    "{ a /* cool */ : 1",
+    "{ a /* cool */ => 1",
+    "{ a: 1 /* cool */ }",
+    "{ a: 1, /* cool */ b: 2 }",
+    "{ a: 1, b /* cool */ : 2 }",
+    "{ a: 1, b /* cool */ => 2 }",
+    "{ a: 1, b => /* cool */ 2 }",
+    "{ a: 1, b => 2 /* cool */ }",
+    "{ /* cool */ **kargs }",
+    "{ **kargs /* cool */ }"
   ].each do |input|
     context input do
       let!(:input) { input }
 
-      it { expect(subject.to_json).to include("comment") }
+      it { expect(subject.to_json).to include("cool") }
     end
   end
 end

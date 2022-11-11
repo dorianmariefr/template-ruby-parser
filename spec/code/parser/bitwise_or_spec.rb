@@ -12,15 +12,15 @@ RSpec.describe ::Code::Parser do
   end
 
   [
-    "a /* comment */ | b",
-    "a | /* comment */ b",
-    "a |  b | c /* comment */",
-    "a | b | /* comment */ c"
+    "a /* cool */ | b",
+    "a | /* cool */ b",
+    "a |  b | c /* cool */",
+    "a | b | /* cool */ c"
   ].each do |input|
     context input do
       let!(:input) { input }
 
-      it { expect(subject.to_json).to include("comment") }
+      it { expect(subject.to_json).to include("cool") }
     end
   end
 end
