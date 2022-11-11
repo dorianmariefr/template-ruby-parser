@@ -1,16 +1,15 @@
 class Code
   class Parser
-    class Multiplication < ::Code::Parser
+    class Addition < ::Code::Parser
       def parse
-        previous_cursor = cursor
-        left = parse_subclass(::Code::Parser::UnaryMinus)
+        left = parse_subclass(::Code::Parser::Multiplication)
         right = []
         previous_cursor = cursor
         comments = parse_comments
 
-        while (operator = match(ASTERISK)) || (operator = match(SLASH))
+        while (operator = match(PLUS)) || (operator = match(MINUS))
           comments = parse_comments
-          statement = parse_subclass(::Code::Parser::UnaryMinus)
+          statement = parse_subclass(::Code::Parser::Multiplication)
           right << {
             comments: comments,
             statement: statement,
@@ -24,7 +23,7 @@ class Code
           left
         else
           {
-            multiplication: {
+            addition: {
               left: left,
               comments: comments,
               right: right

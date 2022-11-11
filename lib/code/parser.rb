@@ -141,7 +141,9 @@ class Code
 
     def next?(expected)
       if expected.is_a?(Array)
-        expected.any? { |e| next?(e) }
+        expected.any? do |e|
+          input[cursor, e.size] == e
+        end
       else
         input[cursor, expected.size] == expected
       end

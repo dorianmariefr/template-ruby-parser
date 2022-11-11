@@ -3,6 +3,7 @@ GEM
   specs:
     diff-lcs (1.5.0)
     prettier_print (1.0.2)
+    profile (0.4.0)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)
@@ -23,6 +24,7 @@ PLATFORMS
   arm64-darwin-21
 
 DEPENDENCIES
+  profile
   rspec
   syntax_tree
 
