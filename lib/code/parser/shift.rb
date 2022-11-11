@@ -1,11 +1,11 @@
 class Code
   class Parser
-    class Multiplication < ::Code::Parser
+    class Shift < ::Code::Parser
       def parse
         parse_subclass(
           ::Code::Parser::Operation,
-          operators: [ASTERISK, SLASH],
-          subclass: ::Code::Parser::UnaryMinus
+          operators: [GREATER + GREATER, LESSER + LESSER],
+          subclass: ::Code::Parser::Addition
         )
       end
     end

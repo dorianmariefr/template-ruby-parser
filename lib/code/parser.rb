@@ -141,9 +141,7 @@ class Code
 
     def next?(expected)
       if expected.is_a?(Array)
-        expected.any? do |e|
-          input[cursor, e.size] == e
-        end
+        expected.any? { |e| input[cursor, e.size] == e }
       else
         input[cursor, expected.size] == expected
       end
@@ -171,8 +169,8 @@ class Code
       end
     end
 
-    def parse_subclass(subclass)
-      parser = subclass.new(input, cursor: cursor, check_end_of_input: false)
+    def parse_subclass(subclass, **kargs)
+      parser = subclass.new(input, cursor: cursor, check_end_of_input: false, **kargs)
       output = parser.parse
       @cursor = parser.cursor
       output
