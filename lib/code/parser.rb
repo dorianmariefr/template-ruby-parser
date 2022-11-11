@@ -157,7 +157,7 @@ class Code
 
     def match(expected)
       if expected.is_a?(Array)
-        expected.any? { |e| match(e) }
+        expected.detect { |e| match(e) }
       else
         if input[cursor, expected.size] == expected
           @buffer += expected

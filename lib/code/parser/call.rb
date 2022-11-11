@@ -107,8 +107,8 @@ class Code
         comments_after = parse_comments
 
         if key && match(COLON) || match(EQUAL + GREATER)
-          default = parse_code
-          default = nil if default.empty?
+          default = parse_default
+
           {
             comments_before: comments_before,
             comments_after: comments_after,
@@ -131,8 +131,7 @@ class Code
           comments_after = parse_comments
 
           if match(EQUAL)
-            default = parse_code
-            default = nil if default.empty?
+            default = parse_default
 
             {
               comments_before: comments_before,
@@ -152,6 +151,20 @@ class Code
           buffer!
           return
         end
+      end
+
+      def parse_default
+        comments_before = parse_comments
+        statement = parse_subclass(::Code::Parser::BitwiseAnd)
+        comments_after = parse_comments
+
+        default = {
+          comments_before: comments_before,
+          statement: statement,
+          comments_after: comments_after
+        }.compact
+
+        default.empty? ? nil : default
       end
     end
   end

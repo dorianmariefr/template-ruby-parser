@@ -2,7 +2,7 @@ class Code
   class Parser
     class Function < ::Code::Parser
       def parse
-        return parse_chained_call unless next?(OPENING_PARENTHESIS)
+        return parse_next unless next?(OPENING_PARENTHESIS)
         previous_cursor = cursor
         match(OPENING_PARENTHESIS)
         parameters_comments = parse_comments
@@ -26,16 +26,16 @@ class Code
           else
             buffer!
             @cursor = previous_cursor
-            parse_chained_call
+            parse_next
           end
         else
           buffer!
           @cursor = previous_cursor
-          parse_chained_call
+          parse_next
         end
       end
 
-      def parse_chained_call
+      def parse_next
         parse_subclass(::Code::Parser::ChainedCall)
       end
 
@@ -62,8 +62,6 @@ class Code
 
         if key && (match(COLON) || match(EQUAL + GREATER))
           default = parse_code
-
-          default = nil if default.empty?
 
           {
             default: default,
