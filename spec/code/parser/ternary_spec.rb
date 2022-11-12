@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
-  ["a..b"].each do |input|
+  ["a ? b : c", "a ? b", "a ? b ? c : d : e", "a ? b ? c : d"].each do |input|
     context input do
       let!(:input) { input }
 
@@ -11,7 +11,12 @@ RSpec.describe ::Code::Parser do
     end
   end
 
-  ["a /* cool */ .. b", "a .. /* cool */ b"].each do |input|
+  [
+    "a /* cool */ ? b : c",
+    "a ? /* cool */ b",
+    "a ? b /* cool */ ? c : d : e",
+    "a ? b ? /* cool */ c : d"
+  ].each do |input|
     context input do
       let!(:input) { input }
 

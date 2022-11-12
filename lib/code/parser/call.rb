@@ -21,6 +21,7 @@ class Code
           arguments = nil
         end
 
+        previous_cursor = cursor
         comments = parse_comments
 
         if match(DO_KEYWORD)
@@ -30,6 +31,8 @@ class Code
           block = parse_block
           match(CLOSING_CURLY_BRACKET)
         else
+          @cursor = previous_cursor
+          buffer!
           block = nil
         end
 
