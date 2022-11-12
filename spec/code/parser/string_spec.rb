@@ -7,6 +7,7 @@ RSpec.describe ::Code::Parser do
     "''",
     '""',
     ":a",
+    ":even?",
     "'Hello Dorian'",
     '"Hello Dorian"',
     "'Hello \\' Dorian'",

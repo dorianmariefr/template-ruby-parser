@@ -1,11 +1,11 @@
-require_relative "lib/template-ruby-parser"
+require_relative "lib/code-ruby-parser"
 
 Gem::Specification.new do |s|
-  s.name = "template-ruby-parser"
+  s.name = "code-ruby-parser"
   s.version = ::Template::Parser::Version
-  s.summary = "A parser for the Template programming language"
+  s.summary = "A parser for the Code programming language"
   s.description =
-    'Like "Hello {name}" with {name: "Dorian"} gives "Hello Dorian"'
+    "A parser for the Code programming language, like 1 + 1 and user.first_name"
   s.authors = ["Dorian Marié"]
   s.email = "dorian@dorianmarie.fr"
   s.files = `git ls-files`.split($/)

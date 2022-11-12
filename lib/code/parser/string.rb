@@ -9,6 +9,7 @@ class Code
         elsif match(COLON) && !next?(SPECIAL)
           buffer!
           consume while !next?(SPECIAL) && !end_of_input?
+          match(QUESTION_MARK) || match(EXCLAMATION_POINT)
           { string: buffer }
         else
           parse_subclass(::Code::Parser::Number)
