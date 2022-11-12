@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
-  ["not a", "not not a"].each do |input|
+  ["a or b", "a and b", "a or b or c", "a and b and c"].each do |input|
     context input do
       let!(:input) { input }
 
@@ -11,7 +11,12 @@ RSpec.describe ::Code::Parser do
     end
   end
 
-  ["not /* cool */ a", "not not /* cool */ a"].each do |input|
+  [
+    "a /* cool */ and b",
+    "a and /* cool */ b",
+    "a or b or c /* cool */",
+    "a or b or /* cool */ c"
+  ].each do |input|
     context input do
       let!(:input) { input }
 

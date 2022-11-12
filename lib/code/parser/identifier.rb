@@ -28,7 +28,13 @@ class Code
 
         name = buffer!
 
-        { name: name, kind: kind }.compact
+        if KEYWORDS.include?(name)
+          @cursor = previous_cursor
+          buffer!
+          return
+        else
+          { name: name, kind: kind }.compact
+        end
       end
     end
   end
