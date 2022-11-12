@@ -3,7 +3,14 @@ require "spec_helper"
 RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
-  ["a == b", "a != b", "a > 1 == true", "a == b == c"].each do |input|
+  [
+    "class A",
+    "class A self.b = 1",
+    "class A < B",
+    "class A end",
+    "class A self.b = 1 end",
+    "class A < B end"
+  ].each do |input|
     context input do
       let!(:input) { input }
 
@@ -12,10 +19,9 @@ RSpec.describe ::Code::Parser do
   end
 
   [
-    "a /* cool */ == b",
-    "a == /* cool */ b",
-    "a == b /* cool */ == c",
-    "a == b == /* cool */ c"
+    "class /* cool */ A",
+    "class A /* cool */ < B",
+    "class A </* cool */ B"
   ].each do |input|
     context input do
       let!(:input) { input }

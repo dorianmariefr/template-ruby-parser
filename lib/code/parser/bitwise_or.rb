@@ -4,7 +4,7 @@ class Code
       def parse
         parse_subclass(
           ::Code::Parser::Operation,
-          operators: [PIPE],
+          operators: [PIPE, CARET],
           subclass: ::Code::Parser::BitwiseAnd
         )
       end

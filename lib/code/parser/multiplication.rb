@@ -4,7 +4,7 @@ class Code
       def parse
         parse_subclass(
           ::Code::Parser::Operation,
-          operators: [ASTERISK, SLASH],
+          operators: [ASTERISK, SLASH, PERCENT],
           subclass: ::Code::Parser::UnaryMinus
         )
       end

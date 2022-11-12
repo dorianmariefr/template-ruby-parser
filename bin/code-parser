@@ -2,6 +2,7 @@
 
 require "optparse"
 require_relative "../lib/code-ruby-parser"
+require "json"
 
 options = {}
 
@@ -23,4 +24,4 @@ OptionParser
 
 input = options.fetch(:input, "")
 
-pp ::Code::Parser.parse(input)
+puts JSON.pretty_generate(::Code::Parser.parse(input))

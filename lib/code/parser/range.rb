@@ -4,7 +4,7 @@ class Code
       def parse
         parse_subclass(
           ::Code::Parser::Operation,
-          operators: [DOT + DOT],
+          operators: [DOT + DOT + DOT, DOT + DOT],
           subclass: ::Code::Parser::OrOperator
         )
       end

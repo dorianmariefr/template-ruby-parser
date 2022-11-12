@@ -1,16 +1,21 @@
 class Code
   class Parser
     class Identifier < ::Code::Parser
+      def initialize(input, simple: false, **kargs)
+        super(input, **kargs)
+        @simple = simple
+      end
+
       def parse
         return if end_of_input?
 
         previous_cursor = cursor
 
-        if match(AMPERSAND) && !next?(SPECIAL)
+        if !simple? && match(AMPERSAND) && !next?(SPECIAL)
           kind = :block
-        elsif match(ASTERISK + ASTERISK) && !next?(SPECIAL)
+        elsif !simple && match(ASTERISK + ASTERISK) && !next?(SPECIAL)
           kind = :keyword
-        elsif match(ASTERISK) && !next?(SPECIAL)
+        elsif !simple? && match(ASTERISK) && !next?(SPECIAL)
           kind = :regular
         elsif !next?(SPECIAL)
           kind = nil
@@ -24,7 +29,7 @@ class Code
 
         consume while !next?(SPECIAL) && !end_of_input?
 
-        match(QUESTION_MARK) || match(EXCLAMATION_POINT)
+        match(QUESTION_MARK) || match(EXCLAMATION_POINT) if !simple?
 
         name = buffer!
 
@@ -35,6 +40,14 @@ class Code
         else
           { name: name, kind: kind }.compact
         end
+      end
+
+      private
+
+      attr_reader :simple
+
+      def simple?
+        !!simple
       end
     end
   end

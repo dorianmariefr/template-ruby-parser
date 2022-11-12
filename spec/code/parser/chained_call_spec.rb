@@ -9,6 +9,7 @@ RSpec.describe ::Code::Parser do
     "a(1).b.c(2)",
     "user.first_name",
     "User.all",
+    "User::Email.first",
     "User.each do |user| user.update(created_at: Time.now) end"
   ].each do |input|
     context input do

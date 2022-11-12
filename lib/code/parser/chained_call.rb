@@ -6,12 +6,12 @@ class Code
         left = parse_dictionnary
         comments_before = parse_comments
 
-        if left && match(DOT)
+        if left && match([DOT, COLON + COLON])
           comments_after = parse_comments
           right = parse_dictionnary
           if right
             chained_call = [{ left: left, right: right }]
-            while match(DOT) && other_right = parse_dictionnary
+            while match([DOT, COLON + COLON]) && other_right = parse_dictionnary
               chained_call << { right: other_right }
             end
             {
