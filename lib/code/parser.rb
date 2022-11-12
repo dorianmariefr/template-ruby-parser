@@ -73,6 +73,8 @@ class Code
     NOT_KEYWORD = "not"
     OR_KEYWORD = "or"
     AND_KEYWORD = "and"
+    IF_KEYWORD = "if"
+    UNLESS_KEYWORD = "unless"
 
     NOTHING_KEYWORDS = [NOTHING_KEYWORD, NULL_KEYWORD, NIL_KEYWORD]
     BOOLEAN_KEYWORDS = [TRUE_KEYWORD, FALSE_KEYWORD]
@@ -84,7 +86,9 @@ class Code
           RESCUE_KEYWORD,
           NOT_KEYWORD,
           OR_KEYWORD,
-          AND_KEYWORD
+          AND_KEYWORD,
+          IF_KEYWORD,
+          UNLESS_KEYWORD
         ]
 
     SPECIAL = [
@@ -212,8 +216,8 @@ class Code
       parse_subclass(::Code::Parser::Code)
     end
 
-    def parse_comments
-      parse_subclass(::Code::Parser::Comments)
+    def parse_comments(whitespace: WHITESPACE)
+      parse_subclass(::Code::Parser::Comments, whitespace: whitespace)
     end
 
     def end_of_input?
