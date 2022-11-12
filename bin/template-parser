@@ -8,7 +8,7 @@ options = {}
 
 OptionParser
   .new do |opts|
-    opts.banner = "Usage: bin/code-parser [options]"
+    opts.banner = "Usage: bin/template-parser [options]"
 
     opts.on(
       "-i INPUT",
@@ -24,4 +24,4 @@ OptionParser
 
 input = options.fetch(:input, "")
 
-puts JSON.pretty_generate(::Code::Parser.parse(input))
+puts JSON.pretty_generate(::Template::Parser.parse(input))
