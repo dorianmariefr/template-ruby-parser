@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+rm *.gem
+git pull
+git push
+gem build template-ruby-parser.gemspec
+gem build code-ruby-parser.gemspec
+gem push *.gem
+rm *.gem
