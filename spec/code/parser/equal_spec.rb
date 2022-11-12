@@ -3,7 +3,23 @@ require "spec_helper"
 RSpec.describe ::Code::Parser do
   subject { ::Code::Parser.parse(input) }
 
-  ["0/0 rescue a", "0/0 rescue 0/0 rescue 'nope'"].each do |input|
+  [
+    "a = 1",
+    "a += 1",
+    "a -= 1",
+    "a *= 1",
+    "a /= 1",
+    "a <<= 1",
+    "a >>= 1",
+    "a &= 1",
+    "a |= 1",
+    "a ^= 1",
+    "a %= 1",
+    "a ||= 1",
+    "a &&= 1",
+    "a = b = 1",
+    "a = b += c"
+  ].each do |input|
     context input do
       let!(:input) { input }
 
@@ -12,10 +28,10 @@ RSpec.describe ::Code::Parser do
   end
 
   [
-    "a /* cool */ rescue b",
-    "a rescue /* cool */ b",
-    "a rescue b /* cool */ rescue c",
-    "a rescue b eescue /* cool */ c"
+    "a /* cool */ = 1",
+    "a += /* cool */ 1",
+    "a = b -= /* cool */ 1",
+    "a = b /* cool */ *= 1"
   ].each do |input|
     context input do
       let!(:input) { input }

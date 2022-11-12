@@ -38,6 +38,24 @@ class Code
     QUESTION_MARK = "?"
     MINUS = "-"
     PLUS = "+"
+    PERCENT = "%"
+    CARET = "^"
+
+    EQUALS = [
+      EQUAL,
+      PLUS + EQUAL,
+      MINUS + EQUAL,
+      ASTERISK + EQUAL,
+      SLASH + EQUAL,
+      PERCENT + EQUAL,
+      GREATER + GREATER + EQUAL,
+      LESSER + LESSER + EQUAL,
+      AMPERSAND + EQUAL,
+      PIPE + EQUAL,
+      CARET + EQUAL,
+      PIPE + PIPE + EQUAL,
+      AMPERSAND + AMPERSAND + EQUAL
+    ]
 
     WHITESPACE = [SPACE, NEWLINE]
 
