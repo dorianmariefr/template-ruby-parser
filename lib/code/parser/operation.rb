@@ -11,28 +11,34 @@ class Code
       def parse
         previous_cursor = cursor
         left = parse_subclass(subclass)
-        right = []
-        previous_cursor = cursor
-        comments = parse_comments
-
-        while operator = match(operators)
+        if left
+          right = []
+          previous_cursor = cursor
           comments = parse_comments
-          statement = parse_subclass(subclass)
-          right << {
-            comments: comments,
-            statement: statement,
-            operator: operator
-          }.compact
-        end
 
-        if right.empty?
+          while operator = match(operators)
+            comments = parse_comments
+            statement = parse_subclass(subclass)
+            right << {
+              comments: comments,
+              statement: statement,
+              operator: operator
+            }.compact
+          end
+
+          if right.empty?
+            @cursor = previous_cursor
+            buffer!
+            left
+          else
+            {
+              operation: { left: left, comments: comments, right: right }.compact
+            }
+          end
+        else
           @cursor = previous_cursor
           buffer!
-          left
-        else
-          {
-            operation: { left: left, comments: comments, right: right }.compact
-          }
+          return
         end
       end
 

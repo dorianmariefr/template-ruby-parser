@@ -1,3 +1,7 @@
+### 0.1.2 - November 12, 2022
+
+- Fix parsing `&:even?`
+
 ### 0.1.1 - November 12, 2022
 
 - Fix `:even?` and `:update?` strings

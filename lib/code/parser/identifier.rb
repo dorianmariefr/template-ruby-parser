@@ -9,36 +9,22 @@ class Code
       def parse
         return if end_of_input?
 
-        previous_cursor = cursor
+        if !simple? && match(AMPERSAND)
+          { block: parse_subclass(::Code::Parser::Statement) }
+        elsif !simple && match(ASTERISK + ASTERISK)
+          { keyword_splat: parse_subclass(::Code::Parser::Statement) }
+        elsif !simple? && match(ASTERISK)
+          { regular_splat: parse_subclass(::Code::Parser::Statement) }
+        elsif !next?(SPECIAL) && !next?(KEYWORDS)
+          consume while !next?(SPECIAL) && !end_of_input?
 
-        if !simple? && match(AMPERSAND) && !next?(SPECIAL)
-          kind = :block
-        elsif !simple && match(ASTERISK + ASTERISK) && !next?(SPECIAL)
-          kind = :keyword
-        elsif !simple? && match(ASTERISK) && !next?(SPECIAL)
-          kind = :regular
-        elsif !next?(SPECIAL)
-          kind = nil
+          match(QUESTION_MARK) || match(EXCLAMATION_POINT) if !simple?
+
+          name = buffer!
+
+          { name: name }
         else
-          @cursor = previous_cursor
-          buffer!
           return
-        end
-
-        buffer!
-
-        consume while !next?(SPECIAL) && !end_of_input?
-
-        match(QUESTION_MARK) || match(EXCLAMATION_POINT) if !simple?
-
-        name = buffer!
-
-        if KEYWORDS.include?(name)
-          @cursor = previous_cursor
-          buffer!
-          return
-        else
-          { name: name, kind: kind }.compact
         end
       end
 

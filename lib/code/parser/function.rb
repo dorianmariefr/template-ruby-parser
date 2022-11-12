@@ -68,7 +68,7 @@ class Code
             keyword: true,
             comments_before: comments_before,
             comments_after: comments_after,
-            **key
+            identifier: key
           }.compact
         else
           @cursor = previous_cursor
@@ -96,7 +96,7 @@ class Code
             default: default,
             comments_before: comments_before,
             comments_after: comments_after,
-            **identifier
+            identifier: identifier
           }.compact
         else
           @cursor = previous_cursor

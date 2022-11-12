@@ -38,7 +38,7 @@ class Code
 
         {
           call: {
-            **identifier,
+            identifier: identifier,
             arguments: arguments,
             block: block,
             comments: comments
@@ -117,7 +117,7 @@ class Code
             comments_after: comments_after,
             default: default,
             keyword: true,
-            **key
+            identifier: key
           }.compact
         else
           @cursor = previous_cursor
@@ -140,13 +140,13 @@ class Code
               comments_before: comments_before,
               comments_after: comments_after,
               default: default,
-              **identifier
+              identifier: identifier
             }.compact
           else
             {
               comments_before: comments_before,
               comments_after: comments_after,
-              **identifier
+              identifier: identifier
             }.compact
           end
         else
