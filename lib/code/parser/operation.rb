@@ -12,17 +12,21 @@ class Code
         previous_cursor = cursor
         left = parse_subclass(subclass)
         if left
-          right = []
           previous_cursor = cursor
           comments = parse_comments
+          right = []
 
           while operator = match(operators)
-            comments = parse_comments
+            comments_before = parse_comments
             statement = parse_subclass(subclass)
+            previous_cursor = cursor
+            comments_after = parse_comments
+
             right << {
-              comments: comments,
               statement: statement,
-              operator: operator
+              operator: operator,
+              comments_before: comments_before,
+              comments_after: comments_after
             }.compact
           end
 
@@ -31,11 +35,16 @@ class Code
             buffer!
             left
           else
+            @cursor = previous_cursor
+            buffer!
+
+            right[-1].delete(:comments_after)
+
             {
               operation: {
                 left: left,
-                comments: comments,
-                right: right
+                right: right,
+                comments: comments
               }.compact
             }
           end

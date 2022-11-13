@@ -7,7 +7,7 @@ class Code
         if match(CLASS_KEYWORD)
           first_comments = parse_comments
 
-          name = parse_subclass(::Code::Parser::Identifier, simple: true)
+          name = parse_subclass(::Code::Parser::Name)
 
           if name
             second_comments = parse_comments
@@ -15,8 +15,7 @@ class Code
             if match(LESSER)
               previous_cursor = cursor
               third_comments = parse_comments
-              superclass =
-                parse_subclass(::Code::Parser::Identifier, simple: true)
+              superclass = parse_subclass(::Code::Parser::Name)
 
               if !superclass
                 @cursor = previous_cursor

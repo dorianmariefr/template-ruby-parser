@@ -2,8 +2,8 @@ class Code
   class Parser
     class Power < ::Code::Parser
       def parse
-        previous_cursor = cursor
         left = parse_subclass(::Code::Parser::Negation)
+        previous_cursor = cursor
         comments_before = parse_comments
         if match(ASTERISK + ASTERISK)
           comments_after = parse_comments
@@ -20,12 +20,12 @@ class Code
           else
             @cursor = previous_cursor
             buffer!
-            parse_subclass(::Code::Parser::Negation)
+            left
           end
         else
           @cursor = previous_cursor
           buffer!
-          parse_subclass(::Code::Parser::Negation)
+          left
         end
       end
     end

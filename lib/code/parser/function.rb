@@ -55,20 +55,18 @@ class Code
         previous_cursor = cursor
 
         comments_before = parse_comments
-
-        key = parse_subclass(::Code::Parser::Identifier)
-
+        name = parse_subclass(::Code::Parser::Name)
         comments_after = parse_comments
 
-        if key && (match(COLON) || match(EQUAL + GREATER))
+        if name && (match(COLON) || match(EQUAL + GREATER))
           default = parse_code
 
           {
+            kind: :keyword,
+            name: name,
             default: default,
-            keyword: true,
             comments_before: comments_before,
-            comments_after: comments_after,
-            identifier: key
+            comments_after: comments_after
           }.compact
         else
           @cursor = previous_cursor
@@ -79,13 +77,23 @@ class Code
 
       def parse_regular_parameter
         previous_cursor = cursor
+
         comments_before = parse_comments
 
-        identifier = parse_subclass(::Code::Parser::Identifier)
+        if match(AMPERSAND)
+          kind = :block
+        elsif match(ASTERISK + ASTERISK)
+          kind = :keyword_splat
+        elsif match(ASTERISK)
+          kind = :regular_splat
+        else
+          kind = nil
+        end
 
+        name = parse_subclass(::Code::Parser::Name)
         comments_after = parse_comments
 
-        if identifier
+        if name
           if match(EQUAL)
             default = parse_code
           else
@@ -93,10 +101,11 @@ class Code
           end
 
           {
+            kind: kind,
+            name: name,
             default: default,
             comments_before: comments_before,
-            comments_after: comments_after,
-            identifier: identifier
+            comments_after: comments_after
           }.compact
         else
           @cursor = previous_cursor

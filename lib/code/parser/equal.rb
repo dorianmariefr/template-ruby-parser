@@ -9,7 +9,6 @@ class Code
         comments_before = parse_comments
 
         if operator = match(EQUALS)
-          previous_cursor = cursor
           comments_after = parse_comments
 
           right = parse_subclass(::Code::Parser::Equal)
@@ -26,7 +25,7 @@ class Code
           else
             @cursor = previous_cursor
             buffer!
-            { equal: { left: left, comments_before: comments_before } }
+            left
           end
         else
           @cursor = previous_cursor

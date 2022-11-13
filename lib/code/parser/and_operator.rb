@@ -5,7 +5,7 @@ class Code
         parse_subclass(
           ::Code::Parser::Operation,
           operators: [AMPERSAND + AMPERSAND],
-          subclass: ::Code::Parser::GreaterThan
+          subclass: ::Code::Parser::Equality
         )
       end
     end

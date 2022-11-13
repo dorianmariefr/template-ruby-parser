@@ -13,34 +13,38 @@ class Code
 
           match(CLOSING_CURLY_BRACKET)
 
-          { dictionnary: dictionnary.compact, comments: comments }
+          { dictionnary: dictionnary.compact, comments: comments }.compact
         else
           parse_subclass(::Code::Parser::List)
         end
       end
 
       def parse_key_value
+        previous_cursor = cursor
+
         comments_before = parse_comments
 
         key = parse_subclass(::Code::Parser::Statement)
 
         comments_after = parse_comments
 
-        return unless key
+        if key
+          if match(COLON) || match(EQUAL + GREATER)
+            value = parse_code
+          else
+            value = nil
+          end
 
-        if match(COLON) || match(EQUAL + GREATER)
           {
             key: key,
-            value: parse_code,
+            value: value,
             comments_before: comments_before,
             comments_after: comments_after
           }.compact
         else
-          {
-            key: key,
-            comments_before: comments_before,
-            comments_after: comments_after
-          }.compact
+          @cursor = previous_cursor
+          buffer!
+          return
         end
       end
     end

@@ -14,7 +14,7 @@ RSpec.describe ::Code::Parser do
     context input do
       let!(:input) { input }
 
-      it { expect { subject }.to_not raise_error }
+      it { subject }
     end
   end
 

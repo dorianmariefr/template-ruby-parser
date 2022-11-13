@@ -10,7 +10,7 @@ class Code
             }
           }
         else
-          parse_subclass(::Code::Parser::Function)
+          parse_subclass(::Code::Parser::Splat)
         end
       end
     end

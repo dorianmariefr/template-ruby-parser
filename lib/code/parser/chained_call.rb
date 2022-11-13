@@ -2,8 +2,8 @@ class Code
   class Parser
     class ChainedCall < ::Code::Parser
       def parse
-        previous_cursor = cursor
         left = parse_dictionnary
+        previous_cursor = cursor
         comments_before = parse_comments
 
         if left && match([DOT, COLON + COLON])
@@ -24,12 +24,12 @@ class Code
           else
             @cursor = previous_cursor
             buffer!
-            parse_dictionnary
+            left
           end
         else
           @cursor = previous_cursor
           buffer!
-          parse_dictionnary
+          left
         end
       end
 

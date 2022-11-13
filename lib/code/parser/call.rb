@@ -2,8 +2,8 @@ class Code
   class Parser
     class Call < ::Code::Parser
       def parse
-        identifier = parse_subclass(::Code::Parser::Identifier)
-        return unless identifier
+        name = parse_subclass(::Code::Parser::Name)
+        return unless name
 
         if match(OPENING_PARENTHESIS)
           arguments = []
@@ -38,7 +38,7 @@ class Code
 
         {
           call: {
-            identifier: identifier,
+            name: name,
             arguments: arguments,
             block: block,
             comments: comments
@@ -106,18 +106,18 @@ class Code
         previous_cursor = cursor
 
         comments_before = parse_comments
-        key = parse_subclass(::Code::Parser::Identifier)
+        name = parse_subclass(::Code::Parser::Name)
         comments_after = parse_comments
 
-        if key && match(COLON) || match(EQUAL + GREATER)
+        if name && match(COLON) || match(EQUAL + GREATER)
           default = parse_default
 
           {
-            comments_before: comments_before,
-            comments_after: comments_after,
+            kind: :keyword,
+            name: name,
             default: default,
-            keyword: true,
-            identifier: key
+            comments_before: comments_before,
+            comments_after: comments_after
           }.compact
         else
           @cursor = previous_cursor
@@ -129,26 +129,35 @@ class Code
       def parse_regular_parameter
         previous_cursor = cursor
         comments_before = parse_comments
-        identifier = parse_subclass(::Code::Parser::Identifier)
-        if identifier
+
+        if match(AMPERSAND)
+          kind = :block
+        elsif match(ASTERISK + ASTERISK)
+          kind = :keyword_splat
+        elsif match(ASTERISK)
+          kind = :regular_splat
+        else
+          kind = nil
+        end
+
+        name = parse_subclass(::Code::Parser::Name)
+
+        if name
           comments_after = parse_comments
 
           if match(EQUAL)
             default = parse_default
-
-            {
-              comments_before: comments_before,
-              comments_after: comments_after,
-              default: default,
-              identifier: identifier
-            }.compact
           else
-            {
-              comments_before: comments_before,
-              comments_after: comments_after,
-              identifier: identifier
-            }.compact
+            default = nil
           end
+
+          {
+            comments_before: comments_before,
+            comments_after: comments_after,
+            default: default,
+            name: name,
+            kind: kind
+          }.compact
         else
           @cursor = previous_cursor
           buffer!
@@ -162,8 +171,8 @@ class Code
         comments_after = parse_comments
 
         default = {
-          comments_before: comments_before,
           statement: statement,
+          comments_before: comments_before,
           comments_after: comments_after
         }.compact
 

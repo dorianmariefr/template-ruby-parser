@@ -2,10 +2,15 @@
 
 set -e
 
-rm *.gem
+rm -f *.gem
 git pull
 git push
 gem build template-ruby-parser.gemspec
 gem build code-ruby-parser.gemspec
-gem push *.gem
+
+for file in *.gem
+do
+  gem push $file
+done
+
 rm *.gem

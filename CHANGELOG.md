@@ -1,3 +1,7 @@
+### 0.1.3 - November 13, 2022
+
+- Fix parsing &, *, **
+
 ### 0.1.2 - November 12, 2022
 
 - Fix parsing `&:even?`
