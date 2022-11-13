@@ -10,6 +10,7 @@ class Code
     X = "x"
     O = "o"
     B = "b"
+    E = "e"
 
     SINGLE_QUOTE = "'"
     DOUBLE_QUOTE = '"'

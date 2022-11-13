@@ -1,6 +1,6 @@
 class Template
   class Parser < ::Code::Parser
-    Version = Gem::Version.new("0.1.7")
+    Version = Gem::Version.new("0.1.8")
 
     def parse
       parts = []

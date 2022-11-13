@@ -1,3 +1,7 @@
+### 0.1.8 - November 13, 2022
+
+- Allow numbers with exponents: `1e1`
+
 ### 0.1.7 - November 13, 2022
 
 - Fix parsing of `nothing`
