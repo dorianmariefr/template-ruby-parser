@@ -1,3 +1,7 @@
+### 0.1.6 - November 13, 2022
+
+- Add missing operator from equal, e.g. a += 1, a = 2
+
 ### 0.1.5 - November 13, 2022
 
 - Restrict equal to simplify

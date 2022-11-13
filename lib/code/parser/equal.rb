@@ -16,6 +16,7 @@ class Code
           if right
             {
               equal: {
+                operator: operator,
                 left: left,
                 right: right,
                 comments_before: comments_before,
