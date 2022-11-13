@@ -1,3 +1,7 @@
+### 0.1.5 - November 13, 2022
+
+- Restrict equal to simplify
+
 ### 0.1.4 - November 13, 2022
 
 - Fix a || b

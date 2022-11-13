@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for f in docs/*.code
+do
+  bin/code-parser -i $f
+done
