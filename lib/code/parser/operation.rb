@@ -19,15 +19,20 @@ class Code
           while operator = match(operators)
             comments_before = parse_comments
             statement = parse_subclass(subclass)
-            previous_cursor = cursor
             comments_after = parse_comments
 
-            right << {
-              statement: statement,
-              operator: operator,
-              comments_before: comments_before,
-              comments_after: comments_after
-            }.compact
+            if statement
+              right << {
+                statement: statement,
+                operator: operator,
+                comments_before: comments_before,
+                comments_after: comments_after
+              }.compact
+            else
+              @cursor = previous_cursor
+              buffer!
+              break
+            end
           end
 
           if right.empty?
@@ -35,9 +40,6 @@ class Code
             buffer!
             left
           else
-            @cursor = previous_cursor
-            buffer!
-
             right[-1].delete(:comments_after)
 
             {

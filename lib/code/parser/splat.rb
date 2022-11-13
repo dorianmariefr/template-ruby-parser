@@ -8,7 +8,13 @@ class Code
           comments = parse_comments
           right = parse_next
           if right
-            { splat: { right: right, operator: operator, comments: comments }.compact }
+            {
+              splat: {
+                right: right,
+                operator: operator,
+                comments: comments
+              }.compact
+            }
           else
             @cursor = previous_cursor
             buffer!

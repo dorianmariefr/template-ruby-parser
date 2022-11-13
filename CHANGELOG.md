@@ -1,3 +1,7 @@
+### 0.1.4 - November 13, 2022
+
+- Fix a || b
+
 ### 0.1.3 - November 13, 2022
 
 - Fix parsing &, *, **
