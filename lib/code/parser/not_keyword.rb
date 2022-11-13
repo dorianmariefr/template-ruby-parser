@@ -5,10 +5,12 @@ class Code
         previous_cursor = cursor
 
         if match(NOT_KEYWORD)
+          buffer!
+          consume while next?(WHITESPACE)
           comments = parse_comments
           right = parse_subclass(::Code::Parser::NotKeyword)
 
-          if right
+          if right && (comments || buffer?)
             { not: { right: right, comments: comments }.compact }
           else
             @cursor = previous_cursor
